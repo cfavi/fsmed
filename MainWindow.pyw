@@ -15,9 +15,9 @@ except:
     pass
 
 from PyQt4 import QtGui, QtCore, QtOpenGL
-from diagramscene import *
 import diagramscene_rc
-
+from diagramscene import DiagramItem
+from FsmScene import FsmScene
 
 
 
@@ -31,7 +31,7 @@ class MainWindow(QtGui.QMainWindow):
         self.createMenus()
         self.createToolBox()
 
-        self.scene = DiagramScene(self.itemMenu)
+        self.scene = FsmScene(self.itemMenu)
         self.scene.setSceneRect(QtCore.QRectF(0, 0, 5000, 5000))
         self.scene.itemInserted.connect(self.itemInserted)
         self.scene.textInserted.connect(self.textInserted)
@@ -42,9 +42,9 @@ class MainWindow(QtGui.QMainWindow):
         layout = QtGui.QHBoxLayout()
         layout.addWidget(self.toolBox)
         self.view = QtGui.QGraphicsView(self.scene)
-        #self.view.setViewport(QtOpenGL.QGLWidget()) #CFV GL rendering with AA
-        self.view.setViewport(QtOpenGL.QGLWidget(QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers))) #CFV GL rendering with AA
-        #self.view.setViewportUpdateMode(QtGui.QGraphicsView.FullViewportUpdate)
+        
+        #self.view.setViewport(QtOpenGL.QGLWidget(QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers))) #CFV GL rendering with AA
+        
         layout.addWidget(self.view)
 
         self.widget = QtGui.QWidget()
@@ -79,10 +79,10 @@ class MainWindow(QtGui.QMainWindow):
                 button.setChecked(False)
 
         if id == self.InsertTextButton:
-            self.scene.setMode(DiagramScene.InsertText)
+            self.scene.setMode(FsmScene.InsertText)
         else:
             self.scene.setItemType(id)
-            self.scene.setMode(DiagramScene.InsertItem)
+            self.scene.setMode(FsmScene.InsertItem)
 
     def deleteItem(self):
         for item in self.scene.selectedItems():
@@ -120,7 +120,7 @@ class MainWindow(QtGui.QMainWindow):
         selectedItem.setZValue(zValue)
 
     def itemInserted(self, item):
-        self.pointerTypeGroup.button(DiagramScene.MoveItem).setChecked(True)
+        self.pointerTypeGroup.button(FsmScene.MoveItem).setChecked(True)
         self.scene.setMode(self.pointerTypeGroup.checkedId())
         self.buttonGroup.button(item.diagramType).setChecked(False)
 
@@ -225,21 +225,21 @@ class MainWindow(QtGui.QMainWindow):
         textWidget.setLayout(textLayout)
         layout.addWidget(textWidget, 1, 1)
 
-        #state Button
-        stateButton = QtGui.QToolButton()
-        stateButton.setCheckable(True)
-        self.buttonGroup.addButton(stateButton, self.InsertTextButton)
-        textButton.setIcon(QtGui.QIcon(QtGui.QPixmap(':/images/textpointer.png')
-                            .scaled(30, 30)))
-        textButton.setIconSize(QtCore.QSize(50, 50))
+        # #state Button
+        # stateButton = QtGui.QToolButton()
+        # stateButton.setCheckable(True)
+        # self.buttonGroup.addButton(stateButton, self.InsertTextButton)
+        # textButton.setIcon(QtGui.QIcon(QtGui.QPixmap(':/images/textpointer.png')
+        #                     .scaled(30, 30)))
+        # textButton.setIconSize(QtCore.QSize(50, 50))
 
-        textLayout = QtGui.QGridLayout()
-        textLayout.addWidget(textButton, 0, 0, QtCore.Qt.AlignHCenter)
-        textLayout.addWidget(QtGui.QLabel("Text"), 1, 0,
-                QtCore.Qt.AlignCenter)
-        textWidget = QtGui.QWidget()
-        textWidget.setLayout(textLayout)
-        layout.addWidget(textWidget, 1, 1)
+        # textLayout = QtGui.QGridLayout()
+        # textLayout.addWidget(textButton, 0, 0, QtCore.Qt.AlignHCenter)
+        # textLayout.addWidget(QtGui.QLabel("Text"), 1, 0,
+        #         QtCore.Qt.AlignCenter)
+        # textWidget = QtGui.QWidget()
+        # textWidget.setLayout(textLayout)
+        # layout.addWidget(textWidget, 1, 1)
 
 
         layout.setRowStretch(3, 10)
@@ -390,9 +390,9 @@ class MainWindow(QtGui.QMainWindow):
         linePointerButton.setIcon(QtGui.QIcon(':/images/linepointer.png'))
 
         self.pointerTypeGroup = QtGui.QButtonGroup()
-        self.pointerTypeGroup.addButton(pointerButton, DiagramScene.MoveItem)
+        self.pointerTypeGroup.addButton(pointerButton, FsmScene.MoveItem)
         self.pointerTypeGroup.addButton(linePointerButton,
-                DiagramScene.InsertLine)
+                FsmScene.InsertLine)
         self.pointerTypeGroup.buttonClicked[int].connect(self.pointerGroupClicked)
 
         self.sceneScaleCombo = QtGui.QComboBox()
@@ -490,4 +490,4 @@ if __name__ == '__main__':
     mainWindow.setGeometry(100, 100, 800, 500)
     mainWindow.show()
 
-    #sys.exit(app.exec_())
+    sys.exit(app.exec_())

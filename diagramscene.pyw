@@ -48,53 +48,6 @@ import math
 
 from PyQt4 import QtCore, QtGui
 
-_oldConnect = QtCore.QObject.connect
-_oldDisconnect = QtCore.QObject.disconnect
-_oldEmit = QtCore.QObject.emit
-
-def _wrapConnect(callableObject):
-    """Returns a wrapped call to the old version of QtCore.QObject.connect"""
-    @staticmethod
-    def call(*args):
-        callableObject(*args)
-        _oldConnect(*args)
-    return call
-
-def _wrapDisconnect(callableObject):
-    """Returns a wrapped call to the old version of QtCore.QObject.disconnect"""
-    @staticmethod
-    def call(*args):
-        callableObject(*args)
-        _oldDisconnect(*args)
-    return call
-
-def enableSignalDebugging(**kwargs):
-    """Call this to enable Qt Signal debugging. This will trap all
-    connect, and disconnect calls."""
-
-    f = lambda *args: None
-    connectCall = kwargs.get('connectCall', f)
-    disconnectCall = kwargs.get('disconnectCall', f)
-    emitCall = kwargs.get('emitCall', f)
-
-    def printIt(msg):
-        def call(*args):
-            print msg, args
-        return call
-    QtCore.QObject.connect = _wrapConnect(connectCall)
-    QtCore.QObject.disconnect = _wrapDisconnect(disconnectCall)
-
-    def new_emit(self, *args):
-        emitCall(self, *args)
-        _oldEmit(self, *args)
-
-    QtCore.QObject.emit = new_emit
-
-def foo(*args):
-    print args
-    
-enableSignalDebugging(connectCall=foo, disconnectCall=foo, emitCall=foo)
-
 
 class Arrow(QtGui.QGraphicsLineItem):
     def __init__(self, startItem, endItem, parent=None, scene=None):
@@ -292,186 +245,54 @@ class DiagramItem(QtGui.QGraphicsPolygonItem):
         return value
 
 
-class StateItem(QtGui.QGraphicsEllipseItem):
+# class StateItem(QtGui.QGraphicsEllipseItem):
 
-    def __init__(self, contextMenu, parent=None, scene=None):
-        super(DiagramItem, self).__init__(parent, scene)
+#     def __init__(self, contextMenu, parent=None, scene=None):
+#         super(StateItem, self).__init__(parent, scene)
 
-        self.arrows = []
-        self.contextMenu = contextMenu
+#         self.arrows = []
+#         self.contextMenu = contextMenu
 
-        #self.setPolygon(self.myPolygon)
-        self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
-        self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
+#         #self.setPolygon(self.myPolygon)
+#         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
+#         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
 
-    def removeArrow(self, arrow):
-        try:
-            self.arrows.remove(arrow)
-        except ValueError:
-            pass
+#     def removeArrow(self, arrow):
+#         try:
+#             self.arrows.remove(arrow)
+#         except ValueError:
+#             pass
 
-    def removeArrows(self):
-        for arrow in self.arrows[:]:
-            arrow.startItem().removeArrow(arrow)
-            arrow.endItem().removeArrow(arrow)
-            self.scene().removeItem(arrow)
+#     def removeArrows(self):
+#         for arrow in self.arrows[:]:
+#             arrow.startItem().removeArrow(arrow)
+#             arrow.endItem().removeArrow(arrow)
+#             self.scene().removeItem(arrow)
 
-    def addArrow(self, arrow):
-        self.arrows.append(arrow)
+#     def addArrow(self, arrow):
+#         self.arrows.append(arrow)
 
-    def image(self):
-        pixmap = QtGui.QPixmap(250, 250)
-        pixmap.fill(QtCore.Qt.transparent)
-        painter = QtGui.QPainter(pixmap)
-        painter.setPen(QtGui.QPen(QtCore.Qt.black, 8))
-        painter.translate(125, 125)
-        painter.drawEllipse(-100, -100, 100, 100)
-        return pixmap
+#     def image(self):
+#         pixmap = QtGui.QPixmap(250, 250)
+#         pixmap.fill(QtCore.Qt.transparent)
+#         painter = QtGui.QPainter(pixmap)
+#         painter.setPen(QtGui.QPen(QtCore.Qt.black, 8))
+#         painter.translate(125, 125)
+#         painter.drawEllipse(-100, -100, 100, 100)
+#         return pixmap
 
-    def contextMenuEvent(self, event):
-        self.scene().clearSelection()
-        self.setSelected(True)
-        self.contextMenu.exec_(event.screenPos())
+#     def contextMenuEvent(self, event):
+#         self.scene().clearSelection()
+#         self.setSelected(True)
+#         self.contextMenu.exec_(event.screenPos())
 
-    def itemChange(self, change, value):
-        if change == QtGui.QGraphicsItem.ItemPositionChange:
-            for arrow in self.arrows:
-                arrow.updatePosition()
+#     def itemChange(self, change, value):
+#         if change == QtGui.QGraphicsItem.ItemPositionChange:
+#             for arrow in self.arrows:
+#                 arrow.updatePosition()
 
-        return value
+#         return value
 
-class DiagramScene(QtGui.QGraphicsScene):
-    InsertItem, InsertLine, InsertText, MoveItem  = range(4)
-
-    itemInserted = QtCore.pyqtSignal(DiagramItem)
-
-    textInserted = QtCore.pyqtSignal(QtGui.QGraphicsTextItem)
-
-    itemSelected = QtCore.pyqtSignal(QtGui.QGraphicsItem)
-
-    def __init__(self, itemMenu, parent=None):
-        super(DiagramScene, self).__init__(parent)
-
-        self.myItemMenu = itemMenu
-        self.myMode = self.MoveItem
-        self.myItemType = DiagramItem.Step
-        self.line = None
-        self.textItem = None
-        self.myItemColor = QtCore.Qt.white
-        self.myTextColor = QtCore.Qt.black
-        self.myLineColor = QtCore.Qt.black
-        self.myFont = QtGui.QFont()
-
-    def setLineColor(self, color):
-        self.myLineColor = color
-        if self.isItemChange(Arrow):
-            item = self.selectedItems()[0]
-            item.setColor(self.myLineColor)
-            self.update()
-
-    def setTextColor(self, color):
-        self.myTextColor = color
-        if self.isItemChange(DiagramTextItem):
-            item = self.selectedItems()[0]
-            item.setDefaultTextColor(self.myTextColor)
-
-    def setItemColor(self, color):
-        self.myItemColor = color
-        if self.isItemChange(DiagramItem):
-            item = self.selectedItems()[0]
-            item.setBrush(self.myItemColor)
-
-    def setFont(self, font):
-        self.myFont = font
-        if self.isItemChange(DiagramTextItem):
-            item = self.selectedItems()[0]
-            item.setFont(self.myFont)
-
-    def setMode(self, mode):
-        self.myMode = mode
-
-    def setItemType(self, type):
-        self.myItemType = type
-
-    def editorLostFocus(self, item):
-        cursor = item.textCursor()
-        cursor.clearSelection()
-        item.setTextCursor(cursor)
-
-        if item.toPlainText():
-            self.removeItem(item)
-            item.deleteLater()
-
-    def mousePressEvent(self, mouseEvent):
-        if (mouseEvent.button() != QtCore.Qt.LeftButton):
-            return
-
-        if self.myMode == self.InsertItem:
-            item = DiagramItem(self.myItemType, self.myItemMenu)
-            item.setBrush(self.myItemColor)
-            self.addItem(item)
-            item.setPos(mouseEvent.scenePos())
-            self.itemInserted.emit(item)
-        elif self.myMode == self.InsertLine:
-            self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
-                                        mouseEvent.scenePos()))
-            self.line.setPen(QtGui.QPen(self.myLineColor, 2))
-            self.addItem(self.line)
-        elif self.myMode == self.InsertText:
-            textItem = DiagramTextItem()
-            textItem.setFont(self.myFont)
-            textItem.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
-            textItem.setZValue(1000.0)
-            textItem.lostFocus.connect(self.editorLostFocus)
-            textItem.selectedChange.connect(self.itemSelected)
-            self.addItem(textItem)
-            textItem.setDefaultTextColor(self.myTextColor)
-            textItem.setPos(mouseEvent.scenePos())
-            self.textInserted.emit(textItem)
-
-        super(DiagramScene, self).mousePressEvent(mouseEvent)
-
-    def mouseMoveEvent(self, mouseEvent):
-        if self.myMode == self.InsertLine and self.line:
-            newLine = QtCore.QLineF(self.line.line().p1(), mouseEvent.scenePos())
-            self.line.setLine(newLine)
-        elif self.myMode == self.MoveItem:
-            super(DiagramScene, self).mouseMoveEvent(mouseEvent)
-
-    def mouseReleaseEvent(self, mouseEvent):
-        if self.line and self.myMode == self.InsertLine:
-            startItems = self.items(self.line.line().p1())
-            if len(startItems) and startItems[0] == self.line:
-                startItems.pop(0)
-            endItems = self.items(self.line.line().p2())
-            if len(endItems) and endItems[0] == self.line:
-                endItems.pop(0)
-
-            self.removeItem(self.line)
-            self.line = None
-
-            if len(startItems) and len(endItems) and \
-                    isinstance(startItems[0], DiagramItem) and \
-                    isinstance(endItems[0], DiagramItem) and \
-                    startItems[0] != endItems[0]:
-                startItem = startItems[0]
-                endItem = endItems[0]
-                arrow = Arrow(startItem, endItem)
-                arrow.setColor(self.myLineColor)
-                startItem.addArrow(arrow)
-                endItem.addArrow(arrow)
-                arrow.setZValue(-1000.0)
-                self.addItem(arrow)
-                arrow.updatePosition()
-
-        self.line = None
-        super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
-
-    def isItemChange(self, type):
-        for item in self.selectedItems():
-            if isinstance(item, type):
-                return True
-        return False
 
 
 
