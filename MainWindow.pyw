@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 28 12:26:22 2014
@@ -29,7 +30,7 @@ class MainWindow(QtGui.QMainWindow):
 
         self.createActions()
         self.createMenus()
-        self.createToolBox()
+        #self.createToolBox()
 
         self.scene = FsmScene(self.itemMenu)
         self.scene.setSceneRect(QtCore.QRectF(0, 0, 5000, 5000))
@@ -39,18 +40,19 @@ class MainWindow(QtGui.QMainWindow):
 
         self.createToolbars()
 
-        layout = QtGui.QHBoxLayout()
-        layout.addWidget(self.toolBox)
+        #layout = QtGui.QHBoxLayout()
+        #layout.addWidget(self.toolBox)
         self.view = QtGui.QGraphicsView(self.scene)
         
         #self.view.setViewport(QtOpenGL.QGLWidget(QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers))) #CFV GL rendering with AA
         
-        layout.addWidget(self.view)
+        #layout.addWidget(self.view)
 
-        self.widget = QtGui.QWidget()
-        self.widget.setLayout(layout)
+        #self.widget = QtGui.QWidget()
+        #self.widget.setLayout(layout)
 
-        self.setCentralWidget(self.widget)
+        #self.setCentralWidget(self.widget)
+        self.setCentralWidget(self.view)
         self.setWindowTitle("Diagramscene")
 
     def backgroundButtonGroupClicked(self, button):

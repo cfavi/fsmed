@@ -1,8 +1,9 @@
 from PyQt4 import QtGui, QtCore
 from diagramscene import Arrow, DiagramItem, DiagramTextItem
+from FsmState import FsmState
 
 class FsmScene(QtGui.QGraphicsScene):
-    InsertItem, InsertLine, InsertText, MoveItem  = range(4)
+    InsertState, InsertLine, InsertText, MoveItem  = range(4)
 
     itemInserted = QtCore.pyqtSignal(DiagramItem)
 
@@ -14,7 +15,7 @@ class FsmScene(QtGui.QGraphicsScene):
         super(FsmScene, self).__init__(parent)
 
         self.myItemMenu = itemMenu
-        self.myMode = self.MoveItem
+        self.myMode = self.InsertState
         self.myItemType = DiagramItem.Step
         self.line = None
         self.textItem = None
@@ -67,12 +68,18 @@ class FsmScene(QtGui.QGraphicsScene):
         if (mouseEvent.button() != QtCore.Qt.LeftButton):
             return
 
-        if self.myMode == self.InsertItem:
-            item = DiagramItem(self.myItemType, self.myItemMenu)
+        if self.myMode == self.InsertState:
+            item = FsmState(self.myItemMenu)
             item.setBrush(self.myItemColor)
             self.addItem(item)
             item.setPos(mouseEvent.scenePos())
-            self.itemInserted.emit(item)
+            #self.itemInserted.emit(item)
+        # elif self.myMode == self.InsertItem:
+        #     item = DiagramItem(self.myItemType, self.myItemMenu)
+        #     item.setBrush(self.myItemColor)
+        #     self.addItem(item)
+        #     item.setPos(mouseEvent.scenePos())
+        #     self.itemInserted.emit(item)
         elif self.myMode == self.InsertLine:
             self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
                                         mouseEvent.scenePos()))
@@ -112,8 +119,8 @@ class FsmScene(QtGui.QGraphicsScene):
             self.line = None
 
             if len(startItems) and len(endItems) and \
-                    isinstance(startItems[0], DiagramItem) and \
-                    isinstance(endItems[0], DiagramItem) and \
+                    isinstance(startItems[0], FsmState) and \
+                    isinstance(endItems[0], FsmState) and \
                     startItems[0] != endItems[0]:
                 startItem = startItems[0]
                 endItem = endItems[0]
@@ -133,4 +140,11 @@ class FsmScene(QtGui.QGraphicsScene):
             if isinstance(item, type):
                 return True
         return False
+
+
+
+
+
+
+
 
