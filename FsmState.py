@@ -5,7 +5,8 @@ class FsmState(QtGui.QGraphicsEllipseItem):
     def __init__(self, contextMenu, parent=None, scene=None):
         super(FsmState, self).__init__(parent, scene)
 
-        self.setRect(-25,-25,50,50)
+        self.diameter = 50
+        self.setRect(self.diameter//-2,self.diameter//-2,self.diameter,self.diameter)
         self.arrows = []
         self.contextMenu = contextMenu
 

@@ -59,7 +59,7 @@ class Arrow(QtGui.QGraphicsLineItem):
         self.myEndItem = endItem
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.myColor = QtCore.Qt.black
-        self.setPen(QtGui.QPen(self.myColor, 2, QtCore.Qt.SolidLine,
+        self.setPen(QtGui.QPen(self.myColor, 1, QtCore.Qt.SolidLine,
                 QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
 
     def setColor(self, color):
@@ -101,6 +101,9 @@ class Arrow(QtGui.QGraphicsLineItem):
         painter.setBrush(self.myColor)
 
         centerLine = QtCore.QLineF(myStartItem.pos(), myEndItem.pos())
+        uv = centerLine.unitVector()        
+        endPos = myEndItem.pos()-QtCore.QPointF(uv.dx()*myEndItem.diameter/2, uv.dy()*myEndItem.diameter/2)
+        
         # endPolygon = myEndItem.polygon()
         # p1 = endPolygon.first() + myEndItem.pos()
 
@@ -112,11 +115,13 @@ class Arrow(QtGui.QGraphicsLineItem):
         #     if intersectType == QtCore.QLineF.BoundedIntersection:
         #         break
         #     p1 = p2
-
+        
         #self.setLine(QtCore.QLineF(intersectPoint, myStartItem.pos()))
-        self.setLine(centerLine)
+        self.setLine(QtCore.QLineF(endPos, myStartItem.pos()))
+        #self.setLine(centerLine)
         line = self.line()
-
+        
+        
         angle = math.acos(line.dx() / line.length())
         if line.dy() >= 0:
             angle = (math.pi * 2.0) - angle
