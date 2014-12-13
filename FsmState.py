@@ -13,6 +13,8 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         #self.setPolygon(self.myPolygon)
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
+        self.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges, True)
+        
 
     def paint(self, painter, option, widget=None):
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -49,8 +51,8 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         self.contextMenu.exec_(event.screenPos())
 
     def itemChange(self, change, value):
-        if change == QtGui.QGraphicsItem.ItemPositionChange:
+        if change == QtGui.QGraphicsItem.ItemPositionHasChanged:
             for arrow in self.arrows:
                 arrow.updatePosition()
-
-        return value
+        
+        return super(FsmState, self).itemChange(change,value)

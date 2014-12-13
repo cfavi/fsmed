@@ -1,6 +1,7 @@
 from PyQt4 import QtGui, QtCore
-from diagramscene import Arrow, DiagramItem, DiagramTextItem
+from diagramscene import DiagramItem, DiagramTextItem
 from FsmState import FsmState
+from FsmTransition import FsmTransition
 
 class FsmScene(QtGui.QGraphicsScene):
     InsertState, InsertLine, InsertText, MoveItem  = range(4)
@@ -26,7 +27,7 @@ class FsmScene(QtGui.QGraphicsScene):
 
     def setLineColor(self, color):
         self.myLineColor = color
-        if self.isItemChange(Arrow):
+        if self.isItemChange(FsmTransition):
             item = self.selectedItems()[0]
             item.setColor(self.myLineColor)
             self.update()
@@ -103,7 +104,7 @@ class FsmScene(QtGui.QGraphicsScene):
         if self.myMode == self.InsertLine and self.line:
             newLine = QtCore.QLineF(self.line.line().p1(), mouseEvent.scenePos())
             self.line.setLine(newLine)
-        elif self.myMode == self.MoveItem:
+        else: #if self.myMode == self.MoveItem:
             super(FsmScene, self).mouseMoveEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
@@ -124,7 +125,7 @@ class FsmScene(QtGui.QGraphicsScene):
                     startItems[0] != endItems[0]:
                 startItem = startItems[0]
                 endItem = endItems[0]
-                arrow = Arrow(startItem, endItem)
+                arrow = FsmTransition(startItem, endItem)
                 arrow.setColor(self.myLineColor)
                 startItem.addArrow(arrow)
                 endItem.addArrow(arrow)
