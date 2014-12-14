@@ -19,6 +19,7 @@ from PyQt4 import QtGui, QtCore, QtOpenGL
 import diagramscene_rc
 from diagramscene import DiagramItem
 from FsmScene import FsmScene
+from FsmGraphicsView import FsmGraphicsView
 
 
 
@@ -42,8 +43,9 @@ class MainWindow(QtGui.QMainWindow):
 
         #layout = QtGui.QHBoxLayout()
         #layout.addWidget(self.toolBox)
-        self.view = QtGui.QGraphicsView(self.scene)
-        
+        self.view = FsmGraphicsView()
+        self.view.setScene(self.scene)
+        self.view.setRenderHint(QtGui.QPainter.Antialiasing)
         #self.view.setViewport(QtOpenGL.QGLWidget(QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers))) #CFV GL rendering with AA
         
         #layout.addWidget(self.view)
@@ -53,7 +55,7 @@ class MainWindow(QtGui.QMainWindow):
 
         #self.setCentralWidget(self.widget)
         self.setCentralWidget(self.view)
-        self.setWindowTitle("Diagramscene")
+        self.setWindowTitle("FSM Editor")
 
     def backgroundButtonGroupClicked(self, button):
         buttons = self.backgroundButtonGroup.buttons()
@@ -83,8 +85,9 @@ class MainWindow(QtGui.QMainWindow):
         if id == self.InsertTextButton:
             self.scene.setMode(FsmScene.InsertText)
         else:
-            self.scene.setItemType(id)
+            #self.scene.setItemType(id)
             self.scene.setMode(FsmScene.InsertItem)
+            
 
     def deleteItem(self):
         for item in self.scene.selectedItems():
@@ -94,7 +97,11 @@ class MainWindow(QtGui.QMainWindow):
 
     def pointerGroupClicked(self, i):
         self.scene.setMode(self.pointerTypeGroup.checkedId())
-
+        if self.pointerTypeGroup.checkedId()==FsmScene.MoveItem:
+            self.view.setDragMode(QtGui.QGraphicsView.RubberBandDrag)
+        else:
+            self.view.setDragMode(QtGui.QGraphicsView.NoDrag)
+            
     def bringToFront(self):
         if not self.scene.selectedItems():
             return
@@ -490,9 +497,14 @@ class MainWindow(QtGui.QMainWindow):
 if __name__ == '__main__':
 
     import sys
-
+    import os
+    if os.name == 'nt':
+        import ctypes
+        myappid = 'spyder' # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        
     app = QtGui.QApplication(sys.argv)
-
+    app.setWindowIcon(QtGui.QIcon('images/fsmed.svg'))
     mainWindow = MainWindow()
     mainWindow.setGeometry(100, 100, 800, 500)
     mainWindow.show()

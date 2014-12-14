@@ -61,7 +61,7 @@ class FsmTransition(QtGui.QGraphicsLineItem):
         myPen = self.pen()
         myPen.setColor(self.myColor)
         arrowSize = 20.0
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        
         painter.setPen(myPen)
         painter.setBrush(self.myColor)
 

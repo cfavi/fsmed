@@ -14,10 +14,8 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges, True)
-        
-
+                
     def paint(self, painter, option, widget=None):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
         
         super(FsmState, self).paint(painter, option, widget)
 
@@ -56,3 +54,27 @@ class FsmState(QtGui.QGraphicsEllipseItem):
                 arrow.updatePosition()
         
         return super(FsmState, self).itemChange(change,value)
+
+
+if __name__ == '__main__':
+    import sys
+    from MainWindow import MainWindow
+    from PyQt4.QtTest import QTest
+    from PyQt4.QtCore import Qt
+    
+    app = QtGui.QApplication(sys.argv)
+
+
+    mainWindow = MainWindow()
+    mainWindow.setGeometry(100, 100, 800, 500)
+    mainWindow.show()
+
+    QTest.mouseClick(mainWindow.addStateButton, Qt.LeftButton)
+    QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
+    QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
+    QTest.mouseClick(mainWindow.linePointerButton, Qt.LeftButton)
+    QTest.mousePress(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
+    QTest.mouseMove(mainWindow.view.viewport(), QtCore.QPoint(100,250))
+    QTest.mouseRelease(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
+        
+    sys.exit(app.exec_()) 
