@@ -1,10 +1,12 @@
 from PyQt4 import QtGui, QtCore
 
 class FsmState(QtGui.QGraphicsEllipseItem):
-
+#class FsmState(QtGui.QGraphicsItem):
+    
     def __init__(self, contextMenu, parent=None, scene=None):
         super(FsmState, self).__init__(parent, scene)
 
+        self.stateName = "S0"
         self.diameter = 50
         self.setRect(self.diameter//-2,self.diameter//-2,self.diameter,self.diameter)
         self.arrows = []
@@ -16,8 +18,9 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         self.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges, True)
                 
     def paint(self, painter, option, widget=None):
-        
+#        painter.drawEllipse(-self.diameter/2, -self.diameter/2, self.diameter, self.diameter)
         super(FsmState, self).paint(painter, option, widget)
+        painter.drawText(self.boundingRect(), QtCore.Qt.AlignCenter, self.stateName)
 
     def removeArrow(self, arrow):
         try:
