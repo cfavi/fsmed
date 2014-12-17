@@ -18,8 +18,12 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         self.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges, True)
                 
     def paint(self, painter, option, widget=None):
-#        painter.drawEllipse(-self.diameter/2, -self.diameter/2, self.diameter, self.diameter)
-        super(FsmState, self).paint(painter, option, widget)
+        if self.isSelected():
+            painter.setBrush(QtCore.Qt.yellow)
+        else:
+            painter.setBrush(QtCore.Qt.cyan)
+        painter.drawEllipse(-self.diameter/2, -self.diameter/2, self.diameter, self.diameter)
+ #       super(FsmState, self).paint(painter, option, widget)
         painter.drawText(self.boundingRect(), QtCore.Qt.AlignCenter, self.stateName)
 
     def removeArrow(self, arrow):
