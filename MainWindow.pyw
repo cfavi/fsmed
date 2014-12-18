@@ -52,7 +52,7 @@ class MainWindow(QtGui.QMainWindow):
 
         #self.widget = QtGui.QWidget()
         #self.widget.setLayout(layout)
-
+        self.statusBar().showMessage('Ready', 2000)
         #self.setCentralWidget(self.widget)
         self.setCentralWidget(self.view)
         self.setWindowTitle("FSM Editor")

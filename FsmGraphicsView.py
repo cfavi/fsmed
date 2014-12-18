@@ -66,7 +66,10 @@ class FsmGraphicsView(QtGui.QGraphicsView):
 
 
     def wheelEvent(self,  event):
-        factor = 1.2;
-        if event.delta() < 0:
-            factor = 1.0 / factor
-        self.scale(factor, factor)
+        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+            factor = 1.2;
+            if event.delta() < 0:
+                factor = 1.0 / factor
+            self.scale(factor, factor)
+        else:
+            super(FsmGraphicsView,self).wheelEvent(event)

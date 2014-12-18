@@ -15,6 +15,8 @@ class FsmScene(QtGui.QGraphicsScene):
     def __init__(self, itemMenu, parent=None):
         super(FsmScene, self).__init__(parent)
 
+        self.gridSize = 10
+        self.stateCreatedIdx = 0
         self.myItemMenu = itemMenu
         self.myMode = self.InsertState
         self.myItemType = DiagramItem.Step
@@ -70,8 +72,9 @@ class FsmScene(QtGui.QGraphicsScene):
             return
 
         if self.myMode == self.InsertState:
-            item = FsmState(self.myItemMenu)
-            item.setBrush(self.myItemColor)
+            item = FsmState(self.myItemMenu, 'S{}'.format(self.stateCreatedIdx))
+            self.stateCreatedIdx += 1
+            #item.setBrush(self.myItemColor)
             self.addItem(item)
             item.setPos(mouseEvent.scenePos())
             #self.itemInserted.emit(item)
