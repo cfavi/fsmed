@@ -17,10 +17,10 @@ class FsmScene(QtGui.QGraphicsScene):
     def __init__(self, itemMenu, parent=None):
         super(FsmScene, self).__init__(parent)
 
-        self.gridSize = 10
+        self.gridSize = 50
         self.stateCreatedIdx = 0
         self.myItemMenu = itemMenu
-        self.myMode = self.InsertState
+        self.myMode = self.MoveItem
         self.myItemType = DiagramItem.Step
         self.line = None
         self.textItem = None
@@ -70,6 +70,7 @@ class FsmScene(QtGui.QGraphicsScene):
             item.deleteLater()
 
     def mousePressEvent(self, mouseEvent):
+        pos = mouseEvent.scenePos().toPoint() / self.gridSize * self.gridSize
         if (mouseEvent.button() != QtCore.Qt.LeftButton):
             return
 
@@ -78,7 +79,7 @@ class FsmScene(QtGui.QGraphicsScene):
             self.stateCreatedIdx += 1
             #item.setBrush(self.myItemColor)
             self.addItem(item)
-            item.setPos(mouseEvent.scenePos())
+            item.setPos(pos)
             #self.itemInserted.emit(item)
         # elif self.myMode == self.InsertItem:
         #     item = DiagramItem(self.myItemType, self.myItemMenu)
@@ -100,7 +101,7 @@ class FsmScene(QtGui.QGraphicsScene):
             textItem.selectedChange.connect(self.itemSelected)
             self.addItem(textItem)
             textItem.setDefaultTextColor(self.myTextColor)
-            textItem.setPos(mouseEvent.scenePos())
+            textItem.setPos(pos)
             self.textInserted.emit(textItem)
 
         super(FsmScene, self).mousePressEvent(mouseEvent)
@@ -140,8 +141,15 @@ class FsmScene(QtGui.QGraphicsScene):
                 arrow.updatePosition()
 
         self.line = None
+        
         super(FsmScene, self).mouseReleaseEvent(mouseEvent)
-
+        #we should realign all selected States to grid
+        #if self.myMode == self.MoveItem:
+        for el in self.selectedItems():
+            if isinstance(el, FsmState):
+                pos = el.scenePos().toPoint() / self.gridSize * self.gridSize
+                el.setPos(pos)
+        
     def isItemChange(self, type):
         for item in self.selectedItems():
             if isinstance(item, type):
