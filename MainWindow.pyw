@@ -20,7 +20,7 @@ import diagramscene_rc
 from diagramscene import DiagramItem
 from FsmScene import FsmScene
 from FsmGraphicsView import FsmGraphicsView
-
+from FsmState import FsmState
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -35,9 +35,9 @@ class MainWindow(QtGui.QMainWindow):
 
         self.scene = FsmScene(self.itemMenu)
         self.scene.setSceneRect(QtCore.QRectF(0, 0, 5000, 5000))
-        self.scene.itemInserted.connect(self.itemInserted)
-        self.scene.textInserted.connect(self.textInserted)
-        self.scene.itemSelected.connect(self.itemSelected)
+        #self.scene.itemInserted.connect(self.itemInserted)
+        #self.scene.textInserted.connect(self.textInserted)
+        #self.scene.itemSelected.connect(self.itemSelected)
         self.scene.mouseMoved.connect(self.updateCoordBox)
         self.createToolbars()
 
@@ -63,36 +63,36 @@ class MainWindow(QtGui.QMainWindow):
         pos = pos.toPoint()
         self.coordBox.setText('({:>4d},{:>4d})'.format(pos.x(), pos.y()))
         
-    def backgroundButtonGroupClicked(self, button):
-        buttons = self.backgroundButtonGroup.buttons()
-        for myButton in buttons:
-            if myButton != button:
-                button.setChecked(False)
+    # def backgroundButtonGroupClicked(self, button):
+    #     buttons = self.backgroundButtonGroup.buttons()
+    #     for myButton in buttons:
+    #         if myButton != button:
+    #             button.setChecked(False)
 
-        text = button.text()
-        if text == "Blue Grid":
-            self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background1.png')))
-        elif text == "White Grid":
-            self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background2.png')))
-        elif text == "Gray Grid":
-            self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background3.png')))
-        else:
-            self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background4.png')))
+    #     text = button.text()
+    #     if text == "Blue Grid":
+    #         self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background1.png')))
+    #     elif text == "White Grid":
+    #         self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background2.png')))
+    #     elif text == "Gray Grid":
+    #         self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background3.png')))
+    #     else:
+    #         self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QPixmap(':/images/background4.png')))
 
-        self.scene.update()
-        self.view.update()
+    #     self.scene.update()
+    #     self.view.update()
 
-    def buttonGroupClicked(self, id):
-        buttons = self.buttonGroup.buttons()
-        for button in buttons:
-            if self.buttonGroup.button(id) != button:
-                button.setChecked(False)
+    # def buttonGroupClicked(self, id):
+    #     buttons = self.buttonGroup.buttons()
+    #     for button in buttons:
+    #         if self.buttonGroup.button(id) != button:
+    #             button.setChecked(False)
 
-        if id == self.InsertTextButton:
-            self.scene.setMode(FsmScene.InsertText)
-        else:
-            #self.scene.setItemType(id)
-            self.scene.setMode(FsmScene.InsertItem)
+    #     if id == self.InsertTextButton:
+    #         self.scene.setMode(FsmScene.InsertText)
+    #     else:
+    #         #self.scene.setItemType(id)
+    #         self.scene.setMode(FsmScene.InsertItem)
             
 
     def deleteItem(self):
@@ -117,7 +117,7 @@ class MainWindow(QtGui.QMainWindow):
 
         zValue = 0
         for item in overlapItems:
-            if (item.zValue() >= zValue and isinstance(item, DiagramItem)):
+            if (item.zValue() >= zValue and isinstance(item, FsmState)):
                 zValue = item.zValue() + 0.1
         selectedItem.setZValue(zValue)
 
@@ -130,7 +130,7 @@ class MainWindow(QtGui.QMainWindow):
 
         zValue = 0
         for item in overlapItems:
-            if (item.zValue() <= zValue and isinstance(item, DiagramItem)):
+            if (item.zValue() <= zValue and isinstance(item, FsmState)):
                 zValue = item.zValue() - 0.1
         selectedItem.setZValue(zValue)
 
@@ -156,26 +156,26 @@ class MainWindow(QtGui.QMainWindow):
         self.view.translate(oldMatrix.dx(), oldMatrix.dy())
         self.view.scale(newScale, newScale)
 
-    def textColorChanged(self):
-        self.textAction = self.sender()
-        self.fontColorToolButton.setIcon(self.createColorToolButtonIcon(
-                    ':/images/textpointer.png',
-                    QtGui.QColor(self.textAction.data())))
-        self.textButtonTriggered()
+    # def textColorChanged(self):
+    #     self.textAction = self.sender()
+    #     self.fontColorToolButton.setIcon(self.createColorToolButtonIcon(
+    #                 ':/images/textpointer.png',
+    #                 QtGui.QColor(self.textAction.data())))
+    #     self.textButtonTriggered()
 
-    def itemColorChanged(self):
-        self.fillAction = self.sender()
-        self.fillColorToolButton.setIcon(self.createColorToolButtonIcon(
-                    ':/images/floodfill.png',
-                    QtGui.QColor(self.fillAction.data())))
-        self.fillButtonTriggered()
+    # def itemColorChanged(self):
+    #     self.fillAction = self.sender()
+    #     self.fillColorToolButton.setIcon(self.createColorToolButtonIcon(
+    #                 ':/images/floodfill.png',
+    #                 QtGui.QColor(self.fillAction.data())))
+    #     self.fillButtonTriggered()
 
-    def lineColorChanged(self):
-        self.lineAction = self.sender()
-        self.lineColorToolButton.setIcon(self.createColorToolButtonIcon(
-                    ':/images/linecolor.png',
-                    QtGui.QColor(self.lineAction.data())))
-        self.lineButtonTriggered()
+    # def lineColorChanged(self):
+    #     self.lineAction = self.sender()
+    #     self.lineColorToolButton.setIcon(self.createColorToolButtonIcon(
+    #                 ':/images/linecolor.png',
+    #                 QtGui.QColor(self.lineAction.data())))
+    #     self.lineButtonTriggered()
 
     def textButtonTriggered(self):
         self.scene.setTextColor(QtGui.QColor(self.textAction.data()))
@@ -211,82 +211,82 @@ class MainWindow(QtGui.QMainWindow):
         QtGui.QMessageBox.about(self, "About Diagram Scene",
                 "The <b>Diagram Scene</b> example shows use of the graphics framework.")
 
-    def createToolBox(self):
-        self.buttonGroup = QtGui.QButtonGroup()
-        self.buttonGroup.setExclusive(False)
-        self.buttonGroup.buttonClicked[int].connect(self.buttonGroupClicked)
+    # def createToolBox(self):
+    #     self.buttonGroup = QtGui.QButtonGroup()
+    #     self.buttonGroup.setExclusive(False)
+    #     self.buttonGroup.buttonClicked[int].connect(self.buttonGroupClicked)
 
-        layout = QtGui.QGridLayout()
-        layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional),
-                0, 0)
-        layout.addWidget(self.createCellWidget("Process", DiagramItem.Step), 0,
-                1)
-        layout.addWidget(self.createCellWidget("Input/Output", DiagramItem.Io),
-                1, 0)
+    #     layout = QtGui.QGridLayout()
+    #     layout.addWidget(self.createCellWidget("Conditional", DiagramItem.Conditional),
+    #             0, 0)
+    #     layout.addWidget(self.createCellWidget("Process", DiagramItem.Step), 0,
+    #             1)
+    #     layout.addWidget(self.createCellWidget("Input/Output", DiagramItem.Io),
+    #             1, 0)
 
-        #text Button
-        textButton = QtGui.QToolButton()
-        textButton.setCheckable(True)
-        self.buttonGroup.addButton(textButton, self.InsertTextButton)
-        textButton.setIcon(QtGui.QIcon(QtGui.QPixmap(':/images/textpointer.png')
-                            .scaled(30, 30)))
-        textButton.setIconSize(QtCore.QSize(50, 50))
+    #     #text Button
+    #     textButton = QtGui.QToolButton()
+    #     textButton.setCheckable(True)
+    #     self.buttonGroup.addButton(textButton, self.InsertTextButton)
+    #     textButton.setIcon(QtGui.QIcon(QtGui.QPixmap(':/images/textpointer.png')
+    #                         .scaled(30, 30)))
+    #     textButton.setIconSize(QtCore.QSize(50, 50))
 
-        textLayout = QtGui.QGridLayout()
-        textLayout.addWidget(textButton, 0, 0, QtCore.Qt.AlignHCenter)
-        textLayout.addWidget(QtGui.QLabel("Text"), 1, 0,
-                QtCore.Qt.AlignCenter)
-        textWidget = QtGui.QWidget()
-        textWidget.setLayout(textLayout)
-        layout.addWidget(textWidget, 1, 1)
+    #     textLayout = QtGui.QGridLayout()
+    #     textLayout.addWidget(textButton, 0, 0, QtCore.Qt.AlignHCenter)
+    #     textLayout.addWidget(QtGui.QLabel("Text"), 1, 0,
+    #             QtCore.Qt.AlignCenter)
+    #     textWidget = QtGui.QWidget()
+    #     textWidget.setLayout(textLayout)
+    #     layout.addWidget(textWidget, 1, 1)
 
-        # #state Button
-        # stateButton = QtGui.QToolButton()
-        # stateButton.setCheckable(True)
-        # self.buttonGroup.addButton(stateButton, self.InsertTextButton)
-        # textButton.setIcon(QtGui.QIcon(QtGui.QPixmap(':/images/textpointer.png')
-        #                     .scaled(30, 30)))
-        # textButton.setIconSize(QtCore.QSize(50, 50))
+    #     # #state Button
+    #     # stateButton = QtGui.QToolButton()
+    #     # stateButton.setCheckable(True)
+    #     # self.buttonGroup.addButton(stateButton, self.InsertTextButton)
+    #     # textButton.setIcon(QtGui.QIcon(QtGui.QPixmap(':/images/textpointer.png')
+    #     #                     .scaled(30, 30)))
+    #     # textButton.setIconSize(QtCore.QSize(50, 50))
 
-        # textLayout = QtGui.QGridLayout()
-        # textLayout.addWidget(textButton, 0, 0, QtCore.Qt.AlignHCenter)
-        # textLayout.addWidget(QtGui.QLabel("Text"), 1, 0,
-        #         QtCore.Qt.AlignCenter)
-        # textWidget = QtGui.QWidget()
-        # textWidget.setLayout(textLayout)
-        # layout.addWidget(textWidget, 1, 1)
+    #     # textLayout = QtGui.QGridLayout()
+    #     # textLayout.addWidget(textButton, 0, 0, QtCore.Qt.AlignHCenter)
+    #     # textLayout.addWidget(QtGui.QLabel("Text"), 1, 0,
+    #     #         QtCore.Qt.AlignCenter)
+    #     # textWidget = QtGui.QWidget()
+    #     # textWidget.setLayout(textLayout)
+    #     # layout.addWidget(textWidget, 1, 1)
 
 
-        layout.setRowStretch(3, 10)
-        layout.setColumnStretch(2, 10)
+    #     layout.setRowStretch(3, 10)
+    #     layout.setColumnStretch(2, 10)
 
-        itemWidget = QtGui.QWidget()
-        itemWidget.setLayout(layout)
+    #     itemWidget = QtGui.QWidget()
+    #     itemWidget.setLayout(layout)
 
-        self.backgroundButtonGroup = QtGui.QButtonGroup()
-        self.backgroundButtonGroup.buttonClicked.connect(self.backgroundButtonGroupClicked)
+    #     #self.backgroundButtonGroup = QtGui.QButtonGroup()
+    #     #self.backgroundButtonGroup.buttonClicked.connect(self.backgroundButtonGroupClicked)
 
-        backgroundLayout = QtGui.QGridLayout()
-        backgroundLayout.addWidget(self.createBackgroundCellWidget("Blue Grid",
-                ':/images/background1.png'), 0, 0)
-        backgroundLayout.addWidget(self.createBackgroundCellWidget("White Grid",
-                ':/images/background2.png'), 0, 1)
-        backgroundLayout.addWidget(self.createBackgroundCellWidget("Gray Grid",
-                ':/images/background3.png'), 1, 0)
-        backgroundLayout.addWidget(self.createBackgroundCellWidget("No Grid",
-                ':/images/background4.png'), 1, 1)
+    #     backgroundLayout = QtGui.QGridLayout()
+    #     backgroundLayout.addWidget(self.createBackgroundCellWidget("Blue Grid",
+    #             ':/images/background1.png'), 0, 0)
+    #     backgroundLayout.addWidget(self.createBackgroundCellWidget("White Grid",
+    #             ':/images/background2.png'), 0, 1)
+    #     backgroundLayout.addWidget(self.createBackgroundCellWidget("Gray Grid",
+    #             ':/images/background3.png'), 1, 0)
+    #     backgroundLayout.addWidget(self.createBackgroundCellWidget("No Grid",
+    #             ':/images/background4.png'), 1, 1)
 
-        backgroundLayout.setRowStretch(2, 10)
-        backgroundLayout.setColumnStretch(2, 10)
+    #     backgroundLayout.setRowStretch(2, 10)
+    #     backgroundLayout.setColumnStretch(2, 10)
 
-        backgroundWidget = QtGui.QWidget()
-        backgroundWidget.setLayout(backgroundLayout)
+    #     backgroundWidget = QtGui.QWidget()
+    #     backgroundWidget.setLayout(backgroundLayout)
 
-        self.toolBox = QtGui.QToolBox()
-        self.toolBox.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Ignored))
-        self.toolBox.setMinimumWidth(itemWidget.sizeHint().width())
-        self.toolBox.addItem(itemWidget, "Basic Flowchart Shapes")
-        self.toolBox.addItem(backgroundWidget, "Backgrounds")
+    #     self.toolBox = QtGui.QToolBox()
+    #     self.toolBox.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Ignored))
+    #     self.toolBox.setMinimumWidth(itemWidget.sizeHint().width())
+    #     self.toolBox.addItem(itemWidget, "Basic Flowchart Shapes")
+    #     self.toolBox.addItem(backgroundWidget, "Backgrounds")
 
     def createActions(self):
         self.fileNewAction = QtGui.QAction(
@@ -306,21 +306,21 @@ class MainWindow(QtGui.QMainWindow):
         
         self.toFrontAction = QtGui.QAction(
                 QtGui.QIcon(':/images/bringtofront.png'), "Bring to &Front",
-                self, shortcut="Ctrl+F", statusTip="Bring item to front",
+                self, shortcut="Ctrl+PgUp", statusTip="Bring item to front",
                 triggered=self.bringToFront)
 
         self.sendBackAction = QtGui.QAction(
                 QtGui.QIcon(':/images/sendtoback.png'), "Send to &Back", self,
-                shortcut="Ctrl+B", statusTip="Send item to back",
+                shortcut="Ctrl+PgDown", statusTip="Send item to back",
                 triggered=self.sendToBack)
 
         self.deleteAction = QtGui.QAction(QtGui.QIcon(':/images/delete.png'),
                 "&Delete", self, shortcut="Delete",
-                statusTip="Delete item from diagram",
+                statusTip="Delete item from FSM",
                 triggered=self.deleteItem)
 
         self.exitAction = QtGui.QAction("E&xit", self, shortcut="Ctrl+X",
-                statusTip="Quit Scenediagram example", triggered=self.close)
+                statusTip="Quit", triggered=self.close)
 
         self.boldAction = QtGui.QAction(QtGui.QIcon(':/images/bold.png'),
                 "Bold", self, checkable=True, shortcut="Ctrl+B",
@@ -366,59 +366,59 @@ class MainWindow(QtGui.QMainWindow):
         self.editToolBar.addAction(self.toFrontAction)
         self.editToolBar.addAction(self.sendBackAction)
 
-        self.fontCombo = QtGui.QFontComboBox()
-        self.fontCombo.currentFontChanged.connect(self.currentFontChanged)
+        # self.fontCombo = QtGui.QFontComboBox()
+        # self.fontCombo.currentFontChanged.connect(self.currentFontChanged)
 
-        self.fontSizeCombo = QtGui.QComboBox()
-        self.fontSizeCombo.setEditable(True)
-        for i in range(8, 30, 2):
-            self.fontSizeCombo.addItem(str(i))
-        validator = QtGui.QIntValidator(2, 64, self)
-        self.fontSizeCombo.setValidator(validator)
-        self.fontSizeCombo.currentIndexChanged.connect(self.fontSizeChanged)
+        # self.fontSizeCombo = QtGui.QComboBox()
+        # self.fontSizeCombo.setEditable(True)
+        # for i in range(8, 30, 2):
+        #     self.fontSizeCombo.addItem(str(i))
+        # validator = QtGui.QIntValidator(2, 64, self)
+        # self.fontSizeCombo.setValidator(validator)
+        # self.fontSizeCombo.currentIndexChanged.connect(self.fontSizeChanged)
 
-        self.fontColorToolButton = QtGui.QToolButton()
-        self.fontColorToolButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
-        self.fontColorToolButton.setMenu(
-                self.createColorMenu(self.textColorChanged, QtCore.Qt.black))
-        self.textAction = self.fontColorToolButton.menu().defaultAction()
-        self.fontColorToolButton.setIcon(
-                self.createColorToolButtonIcon(':/images/textpointer.png',
-                        QtCore.Qt.black))
-        self.fontColorToolButton.setAutoFillBackground(True)
-        self.fontColorToolButton.clicked.connect(self.textButtonTriggered)
+        # self.fontColorToolButton = QtGui.QToolButton()
+        # self.fontColorToolButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        # self.fontColorToolButton.setMenu(
+        #         self.createColorMenu(self.textColorChanged, QtCore.Qt.black))
+        # self.textAction = self.fontColorToolButton.menu().defaultAction()
+        # self.fontColorToolButton.setIcon(
+        #         self.createColorToolButtonIcon(':/images/textpointer.png',
+        #                 QtCore.Qt.black))
+        # self.fontColorToolButton.setAutoFillBackground(True)
+        # self.fontColorToolButton.clicked.connect(self.textButtonTriggered)
 
-        self.fillColorToolButton = QtGui.QToolButton()
-        self.fillColorToolButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
-        self.fillColorToolButton.setMenu(
-                self.createColorMenu(self.itemColorChanged, QtCore.Qt.white))
-        self.fillAction = self.fillColorToolButton.menu().defaultAction()
-        self.fillColorToolButton.setIcon(
-                self.createColorToolButtonIcon(':/images/floodfill.png',
-                        QtCore.Qt.white))
-        self.fillColorToolButton.clicked.connect(self.fillButtonTriggered)
+        # self.fillColorToolButton = QtGui.QToolButton()
+        # self.fillColorToolButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        # self.fillColorToolButton.setMenu(
+        #         self.createColorMenu(self.itemColorChanged, QtCore.Qt.white))
+        # self.fillAction = self.fillColorToolButton.menu().defaultAction()
+        # self.fillColorToolButton.setIcon(
+        #         self.createColorToolButtonIcon(':/images/floodfill.png',
+        #                 QtCore.Qt.white))
+        # self.fillColorToolButton.clicked.connect(self.fillButtonTriggered)
 
-        self.lineColorToolButton = QtGui.QToolButton()
-        self.lineColorToolButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
-        self.lineColorToolButton.setMenu(
-                self.createColorMenu(self.lineColorChanged, QtCore.Qt.black))
-        self.lineAction = self.lineColorToolButton.menu().defaultAction()
-        self.lineColorToolButton.setIcon(
-                self.createColorToolButtonIcon(':/images/linecolor.png',
-                        QtCore.Qt.black))
-        self.lineColorToolButton.clicked.connect(self.lineButtonTriggered)
+        # self.lineColorToolButton = QtGui.QToolButton()
+        # self.lineColorToolButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        # self.lineColorToolButton.setMenu(
+        #         self.createColorMenu(self.lineColorChanged, QtCore.Qt.black))
+        # self.lineAction = self.lineColorToolButton.menu().defaultAction()
+        # self.lineColorToolButton.setIcon(
+        #         self.createColorToolButtonIcon(':/images/linecolor.png',
+        #                 QtCore.Qt.black))
+        # self.lineColorToolButton.clicked.connect(self.lineButtonTriggered)
 
-        self.textToolBar = self.addToolBar("Font")
-        self.textToolBar.addWidget(self.fontCombo)
-        self.textToolBar.addWidget(self.fontSizeCombo)
-        self.textToolBar.addAction(self.boldAction)
-        self.textToolBar.addAction(self.italicAction)
-        self.textToolBar.addAction(self.underlineAction)
+        # self.textToolBar = self.addToolBar("Font")
+        # self.textToolBar.addWidget(self.fontCombo)
+        # self.textToolBar.addWidget(self.fontSizeCombo)
+        # self.textToolBar.addAction(self.boldAction)
+        # self.textToolBar.addAction(self.italicAction)
+        # self.textToolBar.addAction(self.underlineAction)
 
-        self.colorToolBar = self.addToolBar("Color")
-        self.colorToolBar.addWidget(self.fontColorToolButton)
-        self.colorToolBar.addWidget(self.fillColorToolButton)
-        self.colorToolBar.addWidget(self.lineColorToolButton)
+        # self.colorToolBar = self.addToolBar("Color")
+        # self.colorToolBar.addWidget(self.fontColorToolButton)
+        # self.colorToolBar.addWidget(self.fillColorToolButton)
+        # self.colorToolBar.addWidget(self.lineColorToolButton)
 
         self.pointerButton = QtGui.QToolButton()
         self.pointerButton.setCheckable(True)
@@ -449,77 +449,77 @@ class MainWindow(QtGui.QMainWindow):
         self.pointerToolbar.addWidget(self.addStateButton)
         self.pointerToolbar.addWidget(self.sceneScaleCombo)
 
-    def createBackgroundCellWidget(self, text, image):
-        button = QtGui.QToolButton()
-        button.setText(text)
-        button.setIcon(QtGui.QIcon(image))
-        button.setIconSize(QtCore.QSize(50, 50))
-        button.setCheckable(True)
-        self.backgroundButtonGroup.addButton(button)
+    # def createBackgroundCellWidget(self, text, image):
+    #     button = QtGui.QToolButton()
+    #     button.setText(text)
+    #     button.setIcon(QtGui.QIcon(image))
+    #     button.setIconSize(QtCore.QSize(50, 50))
+    #     button.setCheckable(True)
+    #     self.backgroundButtonGroup.addButton(button)
 
-        layout = QtGui.QGridLayout()
-        layout.addWidget(button, 0, 0, QtCore.Qt.AlignHCenter)
-        layout.addWidget(QtGui.QLabel(text), 1, 0, QtCore.Qt.AlignCenter)
+    #     layout = QtGui.QGridLayout()
+    #     layout.addWidget(button, 0, 0, QtCore.Qt.AlignHCenter)
+    #     layout.addWidget(QtGui.QLabel(text), 1, 0, QtCore.Qt.AlignCenter)
 
-        widget = QtGui.QWidget()
-        widget.setLayout(layout)
+    #     widget = QtGui.QWidget()
+    #     widget.setLayout(layout)
 
-        return widget
+    #     return widget
 
-    def createCellWidget(self, text, diagramType):
-        item = DiagramItem(diagramType, self.itemMenu)
-        icon = QtGui.QIcon(item.image())
+    # def createCellWidget(self, text, diagramType):
+    #     item = DiagramItem(diagramType, self.itemMenu)
+    #     icon = QtGui.QIcon(item.image())
 
-        button = QtGui.QToolButton()
-        button.setIcon(icon)
-        button.setIconSize(QtCore.QSize(50, 50))
-        button.setCheckable(True)
-        self.buttonGroup.addButton(button, diagramType)
+    #     button = QtGui.QToolButton()
+    #     button.setIcon(icon)
+    #     button.setIconSize(QtCore.QSize(50, 50))
+    #     button.setCheckable(True)
+    #     self.buttonGroup.addButton(button, diagramType)
 
-        layout = QtGui.QGridLayout()
-        layout.addWidget(button, 0, 0, QtCore.Qt.AlignHCenter)
-        layout.addWidget(QtGui.QLabel(text), 1, 0, QtCore.Qt.AlignCenter)
+    #     layout = QtGui.QGridLayout()
+    #     layout.addWidget(button, 0, 0, QtCore.Qt.AlignHCenter)
+    #     layout.addWidget(QtGui.QLabel(text), 1, 0, QtCore.Qt.AlignCenter)
 
-        widget = QtGui.QWidget()
-        widget.setLayout(layout)
+    #     widget = QtGui.QWidget()
+    #     widget.setLayout(layout)
 
-        return widget
+    #     return widget
 
-    def createColorMenu(self, slot, defaultColor):
-        colors = [QtCore.Qt.black, QtCore.Qt.white, QtCore.Qt.red, QtCore.Qt.blue, QtCore.Qt.yellow]
-        names = ["black", "white", "red", "blue", "yellow"]
+    # def createColorMenu(self, slot, defaultColor):
+    #     colors = [QtCore.Qt.black, QtCore.Qt.white, QtCore.Qt.red, QtCore.Qt.blue, QtCore.Qt.yellow]
+    #     names = ["black", "white", "red", "blue", "yellow"]
 
-        colorMenu = QtGui.QMenu(self)
-        for color, name in zip(colors, names):
-            action = QtGui.QAction(self.createColorIcon(color), name, self,
-                    triggered=slot)
-            action.setData(QtGui.QColor(color)) 
-            colorMenu.addAction(action)
-            if color == defaultColor:
-                colorMenu.setDefaultAction(action)
-        return colorMenu
+    #     colorMenu = QtGui.QMenu(self)
+    #     for color, name in zip(colors, names):
+    #         action = QtGui.QAction(self.createColorIcon(color), name, self,
+    #                 triggered=slot)
+    #         action.setData(QtGui.QColor(color)) 
+    #         colorMenu.addAction(action)
+    #         if color == defaultColor:
+    #             colorMenu.setDefaultAction(action)
+    #     return colorMenu
 
-    def createColorToolButtonIcon(self, imageFile, color):
-        pixmap = QtGui.QPixmap(50, 80)
-        pixmap.fill(QtCore.Qt.transparent)
-        painter = QtGui.QPainter(pixmap)
-        image = QtGui.QPixmap(imageFile)
-        target = QtCore.QRect(0, 0, 50, 60)
-        source = QtCore.QRect(0, 0, 42, 42)
-        painter.fillRect(QtCore.QRect(0, 60, 50, 80), color)
-        painter.drawPixmap(target, image, source)
-        painter.end()
+    # def createColorToolButtonIcon(self, imageFile, color):
+    #     pixmap = QtGui.QPixmap(50, 80)
+    #     pixmap.fill(QtCore.Qt.transparent)
+    #     painter = QtGui.QPainter(pixmap)
+    #     image = QtGui.QPixmap(imageFile)
+    #     target = QtCore.QRect(0, 0, 50, 60)
+    #     source = QtCore.QRect(0, 0, 42, 42)
+    #     painter.fillRect(QtCore.QRect(0, 60, 50, 80), color)
+    #     painter.drawPixmap(target, image, source)
+    #     painter.end()
 
-        return QtGui.QIcon(pixmap)
+    #     return QtGui.QIcon(pixmap)
 
-    def createColorIcon(self, color):
-        pixmap = QtGui.QPixmap(20, 20)
-        painter = QtGui.QPainter(pixmap)
-        painter.setPen(QtCore.Qt.NoPen)
-        painter.fillRect(QtCore.QRect(0, 0, 20, 20), color)
-        painter.end()
+    # def createColorIcon(self, color):
+    #     pixmap = QtGui.QPixmap(20, 20)
+    #     painter = QtGui.QPainter(pixmap)
+    #     painter.setPen(QtCore.Qt.NoPen)
+    #     painter.fillRect(QtCore.QRect(0, 0, 20, 20), color)
+    #     painter.end()
 
-        return QtGui.QIcon(pixmap)
+    #     return QtGui.QIcon(pixmap)
 
     
     def newDocument(self):
