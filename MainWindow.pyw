@@ -289,6 +289,21 @@ class MainWindow(QtGui.QMainWindow):
         self.toolBox.addItem(backgroundWidget, "Backgrounds")
 
     def createActions(self):
+        self.fileNewAction = QtGui.QAction(
+                QtGui.QIcon('images/file/filenew.png'), "&New",
+                self, shortcut="Ctrl+N", statusTip="New document",
+                triggered=self.newDocument)        
+        
+        self.fileOpenAction = QtGui.QAction(
+                QtGui.QIcon('images/file/fileopen.png'), "&Open",
+                self, shortcut="Ctrl+O", statusTip="Open existing document",
+                triggered=self.openDocument)        
+        
+        self.fileSaveAction = QtGui.QAction(
+                QtGui.QIcon('images/file/filesave.png'), "&Save",
+                self, shortcut="Ctrl+S", statusTip="Save document",
+                triggered=self.saveDocument)        
+        
         self.toFrontAction = QtGui.QAction(
                 QtGui.QIcon(':/images/bringtofront.png'), "Bring to &Front",
                 self, shortcut="Ctrl+F", statusTip="Bring item to front",
@@ -325,6 +340,10 @@ class MainWindow(QtGui.QMainWindow):
 
     def createMenus(self):
         self.fileMenu = self.menuBar().addMenu("&File")
+        self.fileMenu.addAction(self.fileNewAction)
+        self.fileMenu.addAction(self.fileOpenAction)
+        self.fileMenu.addAction(self.fileSaveAction)
+        self.fileMenu.addSeparator()        
         self.fileMenu.addAction(self.exitAction)
 
         self.itemMenu = self.menuBar().addMenu("&Item")
@@ -337,6 +356,11 @@ class MainWindow(QtGui.QMainWindow):
         self.aboutMenu.addAction(self.aboutAction)
 
     def createToolbars(self):
+        self.fileToolBar = self.addToolBar("File")
+        self.fileToolBar.addAction(self.fileNewAction)
+        self.fileToolBar.addAction(self.fileOpenAction)
+        self.fileToolBar.addAction(self.fileSaveAction)
+        
         self.editToolBar = self.addToolBar("Edit")
         self.editToolBar.addAction(self.deleteAction)
         self.editToolBar.addAction(self.toFrontAction)
@@ -497,7 +521,13 @@ class MainWindow(QtGui.QMainWindow):
 
         return QtGui.QIcon(pixmap)
 
-
+    
+    def newDocument(self):
+        pass
+    def openDocument(self):
+        pass
+    def saveDocument(self):
+        pass
 
 
 if __name__ == '__main__':
