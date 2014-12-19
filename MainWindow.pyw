@@ -38,7 +38,7 @@ class MainWindow(QtGui.QMainWindow):
         self.scene.itemInserted.connect(self.itemInserted)
         self.scene.textInserted.connect(self.textInserted)
         self.scene.itemSelected.connect(self.itemSelected)
-
+        self.scene.mouseMoved.connect(self.updateCoordBox)
         self.createToolbars()
 
         #layout = QtGui.QHBoxLayout()
@@ -52,11 +52,17 @@ class MainWindow(QtGui.QMainWindow):
 
         #self.widget = QtGui.QWidget()
         #self.widget.setLayout(layout)
+        self.coordBox = QtGui.QLabel('(  0,  0)', self)
         self.statusBar().showMessage('Ready', 2000)
+        self.statusBar().addPermanentWidget(self.coordBox)
         #self.setCentralWidget(self.widget)
         self.setCentralWidget(self.view)
         self.setWindowTitle("FSM Editor")
 
+    def updateCoordBox(self, pos):
+        pos = pos.toPoint()
+        self.coordBox.setText('({:>4d},{:>4d})'.format(pos.x(), pos.y()))
+        
     def backgroundButtonGroupClicked(self, button):
         buttons = self.backgroundButtonGroup.buttons()
         for myButton in buttons:

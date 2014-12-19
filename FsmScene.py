@@ -11,6 +11,8 @@ class FsmScene(QtGui.QGraphicsScene):
     textInserted = QtCore.pyqtSignal(QtGui.QGraphicsTextItem)
 
     itemSelected = QtCore.pyqtSignal(QtGui.QGraphicsItem)
+    
+    mouseMoved = QtCore.pyqtSignal(QtCore.QPointF)
 
     def __init__(self, itemMenu, parent=None):
         super(FsmScene, self).__init__(parent)
@@ -104,6 +106,7 @@ class FsmScene(QtGui.QGraphicsScene):
         super(FsmScene, self).mousePressEvent(mouseEvent)
 
     def mouseMoveEvent(self, mouseEvent):
+        self.mouseMoved.emit(mouseEvent.scenePos())
         if self.myMode == self.InsertLine and self.line:
             newLine = QtCore.QLineF(self.line.line().p1(), mouseEvent.scenePos())
             self.line.setLine(newLine)

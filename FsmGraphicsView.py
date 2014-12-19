@@ -15,6 +15,7 @@ class FsmGraphicsView(QtGui.QGraphicsView):
         self.setDragMode(QtGui.QGraphicsView.RubberBandDrag)
         self._isPanning = False
         self._mousePressed = False
+        self.setMouseTracking(True)
 
     def mousePressEvent(self,  event):
         if event.button() == Qt.LeftButton:
