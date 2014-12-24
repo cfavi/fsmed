@@ -291,17 +291,17 @@ class MainWindow(QtGui.QMainWindow):
     def createActions(self):
         self.fileNewAction = QtGui.QAction(
                 QtGui.QIcon('images/file/filenew.png'), "&New",
-                self, shortcut="Ctrl+N", statusTip="New document",
+                self, shortcut=QtGui.QKeySequence.New, statusTip="New document",
                 triggered=self.newDocument)        
         
         self.fileOpenAction = QtGui.QAction(
                 QtGui.QIcon('images/file/fileopen.png'), "&Open",
-                self, shortcut="Ctrl+O", statusTip="Open existing document",
+                self, shortcut=QtGui.QKeySequence.Open, statusTip="Open existing document",
                 triggered=self.openDocument)        
         
         self.fileSaveAction = QtGui.QAction(
                 QtGui.QIcon('images/file/filesave.png'), "&Save",
-                self, shortcut="Ctrl+S", statusTip="Save document",
+                self, shortcut=QtGui.QKeySequence.Save, statusTip="Save document",
                 triggered=self.saveDocument)        
         
         self.toFrontAction = QtGui.QAction(
@@ -319,7 +319,7 @@ class MainWindow(QtGui.QMainWindow):
                 statusTip="Delete item from FSM",
                 triggered=self.deleteItem)
 
-        self.exitAction = QtGui.QAction("E&xit", self, shortcut="Ctrl+X",
+        self.exitAction = QtGui.QAction("E&xit", self, shortcut=QtGui.QKeySequence.Quit,
                 statusTip="Quit", triggered=self.close)
 
         self.boldAction = QtGui.QAction(QtGui.QIcon(':/images/bold.png'),
@@ -523,11 +523,15 @@ class MainWindow(QtGui.QMainWindow):
 
     
     def newDocument(self):
+        print('New document')
         pass
     def openDocument(self):
+        print('Open document')
         pass
     def saveDocument(self):
-        pass
+        import sys
+        print('Saving document')
+        self.scene.saveDocument(sys.stdout)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ from PyQt4 import QtGui, QtCore
 class FsmState(QtGui.QGraphicsEllipseItem):
 #class FsmState(QtGui.QGraphicsItem):
     
-    def __init__(self, contextMenu, stateName='S0', parent=None, scene=None):
+    def __init__(self, contextMenu, stateName='S0', pos=None, parent=None, scene=None):
         super(FsmState, self).__init__(parent, scene)
 
         self.stateName = stateName
@@ -12,10 +12,16 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         self.arrows = []
         self.contextMenu = contextMenu
 
+        if pos:
+            self.setPos(pos)
+
         #self.setPolygon(self.myPolygon)
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges, True)
+
+    def toStore(self):
+        return "FsmState(contextMenu=None, stateName='{0}', pos={1})\n".format(self.stateName, self.pos())
                 
     def paint(self, painter, option, widget=None):
         if self.isSelected():

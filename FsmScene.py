@@ -29,6 +29,16 @@ class FsmScene(QtGui.QGraphicsScene):
         self.myLineColor = QtCore.Qt.black
         self.myFont = QtGui.QFont()
 
+    def saveDocument(self, fileOut):
+        for i in self.items():
+            fileOut.write(i.toStore())
+            # if isinstance(i,FsmState):
+            #     fileOut.write(i.toStore())
+            # elif isinstance(i,FsmTransition):
+            #     fileOut.write("FsmTransition\n")
+        
+
+
     def setLineColor(self, color):
         self.myLineColor = color
         if self.isItemChange(FsmTransition):

@@ -5,8 +5,6 @@ Created on Sat Dec 13 18:36:41 2014
 @author: favi
 """
 
-import math
-
 from PyQt4 import QtCore, QtGui
 
 
@@ -21,7 +19,10 @@ class FsmTransition(QtGui.QGraphicsLineItem):
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.myColor = QtCore.Qt.black
         self.setPen(QtGui.QPen(self.myColor, 1, QtCore.Qt.SolidLine,
-                QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+                               QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+
+    def toStore(self):
+        return "FsmTransition(startItemName='{0}', endItemName='{1}', scene=self)\n".format(self.startItem().stateName, self.endItem().stateName)
 
     def setColor(self, color):
         self.myColor = color
