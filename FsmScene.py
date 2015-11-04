@@ -144,8 +144,8 @@ class FsmScene(QtGui.QGraphicsScene):
                 endItem = endItems[0]
                 arrow = FsmTransition(startItem, endItem)
                 arrow.setColor(self.myLineColor)
-                startItem.addArrow(arrow)
-                endItem.addArrow(arrow)
+                startItem.addOutboundTransition(arrow)
+                endItem.addInboundTransition(arrow)
                 arrow.setZValue(-1000.0)
                 self.addItem(arrow)
                 arrow.updatePosition()

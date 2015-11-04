@@ -9,7 +9,8 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         self.stateName = stateName
         self.diameter = 50
         self.setRect(self.diameter//-2,self.diameter//-2,self.diameter,self.diameter)
-        self.arrows = []
+        self.outboundTransitions = []
+        self.inboundTransitions = []
         self.contextMenu = contextMenu
 
         if pos:
@@ -35,20 +36,25 @@ class FsmState(QtGui.QGraphicsEllipseItem):
     def keyPressEvent(self, keyEvent):
         pass
 
-    def removeArrow(self, arrow):
-        try:
-            self.arrows.remove(arrow)
-        except ValueError:
-            pass
+    def removeTransition(self, x):
+        if x in self.inboundTransitions:
+            self.inboundTransitions.remove(x)
+        if x in self.outboundTransitions:
+            self.outboundTransitions.remove(x)
 
-    def removeArrows(self):
-        for arrow in self.arrows[:]:
-            arrow.startItem().removeArrow(arrow)
-            arrow.endItem().removeArrow(arrow)
-            self.scene().removeItem(arrow)
+    def removeTransitions(self):
+        for x in self.inboundTransitions[:] + self.outboundTransitions[:]:
+            x.startItem().removeArrow(x)
+            x.endItem().removeArrow(x)
+            self.scene().removeItem(x)
 
-    def addArrow(self, arrow):
-        self.arrows.append(arrow)
+    def addInboundTransition(self, x):
+        self.inboundTransitions.append(x)
+
+    def addOutboundTransition(self, x):
+        self.outboundTransitions.append(x)
+
+
 
     def image(self):
         pixmap = QtGui.QPixmap(250, 250)
@@ -66,8 +72,8 @@ class FsmState(QtGui.QGraphicsEllipseItem):
 
     def itemChange(self, change, value):
         if change == QtGui.QGraphicsItem.ItemPositionHasChanged:
-            for arrow in self.arrows:
-                arrow.updatePosition()
+            for x in self.inboundTransitions + self.outboundTransitions:
+                x.updatePosition()
         
         return super(FsmState, self).itemChange(change,value)
 
