@@ -37,6 +37,7 @@ class FsmScene(QtGui.QGraphicsScene):
             # elif isinstance(i,FsmTransition):
             #     fileOut.write("FsmTransition\n")
         
+
     # Efficiently draws a grid in the background.
     # For more information: http://www.qtcentre.org/threads/5609-Drawing-grids-efficiently-in-QGraphicsScene?p=28905#post28905
     def drawBackground(self, painter, rect):
