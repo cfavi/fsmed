@@ -37,7 +37,24 @@ class FsmScene(QtGui.QGraphicsScene):
             # elif isinstance(i,FsmTransition):
             #     fileOut.write("FsmTransition\n")
         
+    # Efficiently draws a grid in the background.
+    # For more information: http://www.qtcentre.org/threads/5609-Drawing-grids-efficiently-in-QGraphicsScene?p=28905#post28905
+    def drawBackground(self, painter, rect):
+        left = int(rect.left()) - (int(rect.left()) % self.gridSize)
+        right = int(rect.right())
+        top = int(rect.top()) - (int(rect.top()) % self.gridSize)
+        bottom = int(rect.bottom())
 
+        
+        lines = [];
+        
+        for x in range(left, right, self.gridSize):
+            lines.append(QtCore.QLineF(x, rect.top(), x, rect.bottom()));
+        for y in range(top, bottom, self.gridSize):
+            lines.append(QtCore.QLineF(rect.left(), y, rect.right(), y));
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
+        painter.setPen(QtGui.QPen(QtCore.Qt.gray, 0))
+        painter.drawLines(lines);
 
     def setLineColor(self, color):
         self.myLineColor = color
@@ -189,6 +206,8 @@ if __name__ == '__main__':
     QTest.mouseRelease(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
         
     sys.exit(app.exec_()) 
+
+
 
 
 
