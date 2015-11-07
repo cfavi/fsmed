@@ -116,10 +116,21 @@ class FsmScene(QtGui.QGraphicsScene):
         #     item.setPos(mouseEvent.scenePos())
         #     self.itemInserted.emit(item)
         elif self.myMode == self.InsertLine:
-            self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
-                                        mouseEvent.scenePos()))
-            self.line.setPen(QtGui.QPen(self.myLineColor, 2))
-            self.addItem(self.line)
+            #self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
+            #                            mouseEvent.scenePos()))
+            startItems = self.items(mouseEvent.scenePos())
+            if len(startItems) and startItems[0] == self.line:
+                startItems.pop(0)
+            if len(startItems) and \
+               isinstance(startItems[0], FsmState):
+                if not self.line:
+                    startItem = startItems[0]            
+                    self.line = FsmTransition(startItem, None)
+                    self.line.setPen(QtGui.QPen(self.myLineColor, 0))
+                    self.addItem(self.line)
+            elif self.line:
+                self.line.addIntermediatePoint(mouseEvent.scenePos())
+                
         elif self.myMode == self.InsertText:
             textItem = DiagramTextItem()
             textItem.setFont(self.myFont)
@@ -137,38 +148,55 @@ class FsmScene(QtGui.QGraphicsScene):
     def mouseMoveEvent(self, mouseEvent):
         self.mouseMoved.emit(mouseEvent.scenePos())
         if self.myMode == self.InsertLine and self.line:
-            newLine = QtCore.QLineF(self.line.line().p1(), mouseEvent.scenePos())
-            self.line.setLine(newLine)
+            self.line.popIntermediatePoint()
+            self.line.addIntermediatePoint(mouseEvent.scenePos())
+            #newLine = QtCore.QLineF(self.line.line().p1(), mouseEvent.scenePos())
+            #self.line.setLine(newLine)
         else: #if self.myMode == self.MoveItem:
             super(FsmScene, self).mouseMoveEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
         if self.line and self.myMode == self.InsertLine:
-            startItems = self.items(self.line.line().p1())
-            if len(startItems) and startItems[0] == self.line:
-                startItems.pop(0)
-            endItems = self.items(self.line.line().p2())
+            # startItems = self.items(self.line.line().p1())
+            # if len(startItems) and startItems[0] == self.line:
+            #     startItems.pop(0)
+            endItems = self.items(mouseEvent.scenePos())
             if len(endItems) and endItems[0] == self.line:
                 endItems.pop(0)
 
-            self.removeItem(self.line)
-            self.line = None
+            if len(endItems) and \
+               isinstance(endItems[0], FsmState):
+                #in endItems[0] is equal to self.line.startItem (loop back)
+                #we should check that there is at least an intermediate point
+                self.line.popIntermediatePoint()
+                self.line.addEndItem(endItems[0])
+                self.line.startItem().addOutboundTransition(self.line)
+                endItems[0].addInboundTransition(self.line)
+                self.line.setZValue(-1000.0)
+                self.line = None
+                
+            else:
+                self.line.popIntermediatePoint()
+                self.line.addIntermediatePoint(mouseEvent.scenePos())
+                self.line.addIntermediatePoint(mouseEvent.scenePos())
+            
+            
 
-            if len(startItems) and len(endItems) and \
-                    isinstance(startItems[0], FsmState) and \
-                    isinstance(endItems[0], FsmState) and \
-                    startItems[0] != endItems[0]:
-                startItem = startItems[0]
-                endItem = endItems[0]
-                arrow = FsmTransition(startItem, endItem)
-                arrow.setColor(self.myLineColor)
-                startItem.addOutboundTransition(arrow)
-                endItem.addInboundTransition(arrow)
-                arrow.setZValue(-1000.0)
-                self.addItem(arrow)
-                arrow.updatePosition()
+            # if len(startItems) and len(endItems) and \
+            #         isinstance(startItems[0], FsmState) and \
+            #         isinstance(endItems[0], FsmState) and \
+            #         startItems[0] != endItems[0]:
+            #     startItem = startItems[0]
+            #     endItem = endItems[0]
+            #     arrow = FsmTransition(startItem, endItem)
+            #     arrow.setColor(self.myLineColor)
+            #     startItem.addOutboundTransition(arrow)
+            #     endItem.addInboundTransition(arrow)
+            #     arrow.setZValue(-1000.0)
+            #     self.addItem(arrow)
+            #     arrow.updatePosition()
 
-        self.line = None
+        #self.line = None
         
         super(FsmScene, self).mouseReleaseEvent(mouseEvent)
         #we should realign all selected States to grid
@@ -202,9 +230,9 @@ if __name__ == '__main__':
     QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
     QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
     QTest.mouseClick(mainWindow.linePointerButton, Qt.LeftButton)
-    QTest.mousePress(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
-    QTest.mouseMove(mainWindow.view.viewport(), QtCore.QPoint(100,250))
-    QTest.mouseRelease(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
+    # QTest.mousePress(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
+    # QTest.mouseMove(mainWindow.view.viewport(), QtCore.QPoint(100,250))
+    # QTest.mouseRelease(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
         
     sys.exit(app.exec_()) 
 

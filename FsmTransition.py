@@ -17,6 +17,7 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         
         self.myStartItem = startItem
         self.myEndItem = endItem
+        self.intermediatePoints = []
         self.updatePosition()
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.myColor = QtCore.Qt.black
@@ -34,6 +35,19 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
     def endItem(self):
         return self.myEndItem
+
+    def addIntermediatePoint(self, point):        
+        self.intermediatePoints.append(point)
+        self.updatePosition()
+        
+    def popIntermediatePoint(self):
+        if len(self.intermediatePoints):
+            self.intermediatePoints.pop()
+            self.updatePosition()
+
+    def addEndItem(self, endItem):
+        self.myEndItem = endItem
+        self.updatePosition()
 
     # def boundingRect(self):
     #     extra = (self.pen().width() + 20) / 2.0
@@ -54,7 +68,10 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         #                      self.myEndItem.pos())                     
         # self.setLine(line)
         path = QtGui.QPainterPath(self.myStartItem.pos())
-        path.lineTo(self.myEndItem.pos())
+        for p in self.intermediatePoints:
+            path.lineTo(p)
+        if self.myEndItem:
+            path.lineTo(self.myEndItem.pos())
         self.setPath(path)
         self.update(self.boundingRect())
 
