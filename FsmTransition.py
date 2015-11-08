@@ -60,18 +60,74 @@ class FsmTransition(QtGui.QGraphicsPathItem):
     #     path.addPolygon(self.arrowHead)
     #     return path
 
-    def updatePosition(self):
-#        line = QtCore.QLineF(self.mapFromItem(self.myStartItem, 0, 0), 
-#                             self.mapFromItem(self.myEndItem, 0, 0))
+    
 
-        # line = QtCore.QLineF(self.myStartItem.pos(), 
-        #                      self.myEndItem.pos())                     
-        # self.setLine(line)
+    def updatePosition(self):
+        def computeControlPoints(K):
+            '''compute cubicTo control points according to
+            https://www.particleincell.com/2012/bezier-splines/ 
+
+            input K should be a list of x(or y) coordinates of the
+            knots 
+
+            returns two lists of control point x(or y) coordinates of
+            length=(len(K)-1 )
+
+            '''
+            n=len(K)
+            #this is the tridiagonal matrix A 
+            a = [1]*(n-3) + [2]
+            b = [2] + [4]*(n-3) + [7]
+            c = [1]*(n-2)
+
+            #this is rhs
+            d = [K[0]+2*K[1]]
+            d +=[4*K[i]+2*K[i+1] for i in range(1, n-2)] 
+            d +=[8*K[n-2]+K[n-1]]
+            
+            #solve Ax=d with the Thomas algorithm
+            #TODO optimize it with np
+            def TDMAsolve(a,b,c,d):
+                n = len(d)
+                for i in xrange(n-1):
+                    d[i+1] -= 1. * d[i] * a[i] / b[i]
+                    b[i+1] -= 1. * c[i] * a[i] / b[i]
+                for i in reversed(xrange(n-1)):
+                    d[i] -= d[i+1] * c[i] / b[i+1]
+                return [d[i] / b[i] for i in xrange(n)]
+
+            p1 = TDMAsolve(a,b,c,d)
+            p2 = [2*K[i+1]-p1[i+1] for i in range(n-2)] + \
+                 [0.5*(K[n-1]+p1[n-2])]
+            return (p1,p2)
+
+        #start the path
         path = QtGui.QPainterPath(self.myStartItem.pos())
-        for p in self.intermediatePoints:
-            path.lineTo(p)
+        #if the transition is closed we beautify it...
         if self.myEndItem:
-            path.lineTo(self.myEndItem.pos())
+            if len(self.intermediatePoints)==0:
+                path.lineTo(self.myEndItem.pos())
+            else:
+                k = [self.myStartItem.pos()] + \
+                    self.intermediatePoints + \
+                    [self.myEndItem.pos()] 
+
+                kx = [p.x() for p in k]
+                ky = [p.y() for p in k]
+                c1x,c2x = computeControlPoints(kx)
+                c1y,c2y = computeControlPoints(ky)
+                c1 = tuple(QtCore.QPointF(x,y) for x,y in zip(c1x,c1y))
+                c2 = tuple(QtCore.QPointF(x,y) for x,y in zip(c2x,c2y))
+                
+                for cc1,cc2,kk in zip(c1,c2,k[1:]):       
+                    path.cubicTo(cc1,cc2,kk)
+                for cc1 in c1+c2+tuple(k[1:-1]):
+                    path.addEllipse(cc1, 5,5)
+        else:
+            for p in self.intermediatePoints:
+                path.lineTo(p)
+
+                
         self.setPath(path)
         self.update(self.boundingRect())
 

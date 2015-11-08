@@ -178,7 +178,6 @@ class FsmScene(QtGui.QGraphicsScene):
             else:
                 self.line.popIntermediatePoint()
                 self.line.addIntermediatePoint(mouseEvent.scenePos())
-                self.line.addIntermediatePoint(mouseEvent.scenePos())
             
             
 
