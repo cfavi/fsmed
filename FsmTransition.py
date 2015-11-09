@@ -7,22 +7,26 @@ Created on Sat Dec 13 18:36:41 2014
 
 from PyQt4 import QtCore, QtGui
 
+def debugPainterPath(p):
+    n = p.elementCount()
+    print "painterPath object with {} elements".format(n)
+
 class FsmTransition(QtGui.QGraphicsPathItem):
 #class FsmTransition(QtGui.QGraphicsLineItem):
     def __init__(self, startItem, endItem, parent=None, scene=None):
         super(FsmTransition, self).__init__(parent, scene)
 
         self.arrowHead = QtGui.QPolygonF()
-        self.path = QtGui.QPainterPath()
+        #self.path = QtGui.QPainterPath()
         
         self.myStartItem = startItem
         self.myEndItem = endItem
         self.intermediatePoints = []
         self.updatePosition()
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-        self.myColor = QtCore.Qt.black
-        self.setPen(QtGui.QPen(self.myColor, 1, QtCore.Qt.SolidLine,
-                               QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+        #self.myColor = QtCore.Qt.black
+        #self.setPen(QtGui.QPen(self.myColor, 1, QtCore.Qt.SolidLine,
+        #                       QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
 
     def toStore(self):
         return "FsmTransition(startItemName='{0}', endItemName='{1}', scene=self)\n".format(self.startItem().stateName, self.endItem().stateName)
@@ -55,10 +59,10 @@ class FsmTransition(QtGui.QGraphicsPathItem):
     #     p2 = self.line().p2()
     #     return QtCore.QRectF(p1, QtCore.QSizeF(p2.x() - p1.x(), p2.y() - p1.y())).normalized().adjusted(-extra, -extra, extra, extra)
 
-    # def shape(self):
-    #     path = super(FsmTransition, self).shape()
-    #     path.addPolygon(self.arrowHead)
-    #     return path
+    def shape(self):
+        path = self.path() #super(FsmTransition, self).shape()
+        path.addPolygon(self.arrowHead)
+        return path
 
     
 
@@ -107,6 +111,7 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         if self.myEndItem:
             if len(self.intermediatePoints)==0:
                 path.lineTo(self.myEndItem.pos())
+                self.lastSubPath = path
             else:
                 k = [self.myStartItem.pos()] + \
                     self.intermediatePoints + \
@@ -121,82 +126,49 @@ class FsmTransition(QtGui.QGraphicsPathItem):
                 
                 for cc1,cc2,kk in zip(c1,c2,k[1:]):       
                     path.cubicTo(cc1,cc2,kk)
-                for cc1 in c1+c2+tuple(k[1:-1]):
-                    path.addEllipse(cc1, 5,5)
+                for cc1 in k[1:-1]:
+                    path.addEllipse(cc1, 2,2)
+                self.lastSubPath = QtGui.QPainterPath(k[-2])
+                self.lastSubPath.cubicTo(c1[-1],c2[-1],k[-1])
         else:
             for p in self.intermediatePoints:
                 path.lineTo(p)
-
-                
+            self.lastSubPath = path
+        #debugPainterPath(path)
         self.setPath(path)
+        #debugPainterPath(self.path)
         self.update(self.boundingRect())
 
-#     def paint(self, painter, option, widget=None):
-#         if (self.myStartItem.collidesWithItem(self.myEndItem)):
-#             return
+    def paint(self, painter, option, widget=None):
+        myPen = self.pen()
+        if self.isSelected():
+            c = QtGui.QColor() #TODO: highligh color should be taken from preference
+            c.setHsv(30, 255, 255)
+        else:
+            c = QtCore.Qt.black
+        myPen.setColor(c)
+        painter.setPen(c)
 
-#         myStartItem = self.myStartItem
-#         myEndItem = self.myEndItem
-#         myColor = self.myColor
-#         myPen = self.pen()
-#         myPen.setColor(self.myColor)
-#         arrowSize = 20.0
-        
-#         painter.setPen(myPen)
-#         painter.setBrush(self.myColor)
+        path = self.path()        
+        painter.drawPath(path)
 
-#         centerLine = QtCore.QLineF(myStartItem.pos(), myEndItem.pos())
-#         uv = centerLine.unitVector()        
-#         endPos = myEndItem.pos()-QtCore.QPointF(uv.dx()*myEndItem.diameter/2, uv.dy()*myEndItem.diameter/2)
-        
-#         # endPolygon = myEndItem.polygon()
-#         # p1 = endPolygon.first() + myEndItem.pos()
+        #draw arrow
+        painter.setBrush(c)
+        arrowSize = 20
+        arrowAperture = 20 #degrees
+        angle = self.lastSubPath.angleAtPercent(1.)+180
+        if self.myEndItem:
+            arrowTip = QtCore.QLineF.fromPolar(self.myEndItem.diameter/2, angle).translated(self.myEndItem.pos()).p2()
+        else:
+            arrowTip = self.intermediatePoints[-1]
+        arrowP1 = QtCore.QLineF.fromPolar(arrowSize,angle+arrowAperture).translated(arrowTip).p2()             
+        arrowC1 = QtCore.QLineF.fromPolar(arrowSize/2,angle).translated(arrowTip).p2()        
+        arrowP2 = QtCore.QLineF.fromPolar(arrowSize,angle-arrowAperture).translated(arrowTip).p2()
 
-#         # intersectPoint = QtCore.QPointF()
-#         # for i in endPolygon:
-#         #     p2 = i + myEndItem.pos()
-#         #     polyLine = QtCore.QLineF(p1, p2)
-#         #     intersectType = polyLine.intersect(centerLine, intersectPoint)
-#         #     if intersectType == QtCore.QLineF.BoundedIntersection:
-#         #         break
-#         #     p1 = p2
-        
-#         #self.setLine(QtCore.QLineF(intersectPoint, myStartItem.pos()))
-#         self.setLine(QtCore.QLineF(endPos, myStartItem.pos()))
-#         #self.setLine(centerLine)
-#         line = self.line()
-        
-        
-#         # 
-# #        angle = math.acos(line.dx() / line.length())
-# #        if line.dy() >= 0:
-# #            angle = (math.pi * 2.0) - angle
-# #        arrowAperture = math.pi/3.0 #angle 
-# #        arrowP1 = line.p1() + QtCore.QPointF(math.sin(angle + arrowAperture) * arrowSize,
-# #                                        math.cos(angle + arrowAperture) * arrowSize)
-# #        arrowC1 = line.p1() -  QtCore.QPointF(uv.dx()*arrowSize/2, uv.dy()*arrowSize/2)                                
-# #        arrowP2 = line.p1() + QtCore.QPointF(math.sin(angle + math.pi - arrowAperture) * arrowSize,
-# #                                        math.cos(angle + math.pi - arrowAperture) * arrowSize)
-                                        
-#         angle = line.angle() #in degrees
-#         arrowAperture = 20 #degrees    
-#         arrowP1 = QtCore.QLineF.fromPolar(arrowSize,angle+arrowAperture).translated(line.p1()).p2()                                 
-#         arrowC1 = QtCore.QLineF.fromPolar(arrowSize/2,angle).translated(line.p1()).p2()        
-#         arrowP2 = QtCore.QLineF.fromPolar(arrowSize,angle-arrowAperture).translated(line.p1()).p2()
-
-#         self.arrowHead.clear()
-#         for point in [line.p1(), arrowP1, arrowC1, arrowP2]:
-#             self.arrowHead.append(point)
-
-#         painter.drawLine(line)
-#         painter.drawPolygon(self.arrowHead)
-#         if self.isSelected():
-#             painter.setPen(QtGui.QPen(myColor, 1, QtCore.Qt.DashLine))
-#             myLine = QtCore.QLineF(line)
-#             myLine.translate(0, 4.0)
-#             painter.drawLine(myLine)
-#             myLine.translate(0,-8.0)
-#             painter.drawLine(myLine)
+        self.arrowHead.clear()
+        for point in (arrowTip, arrowP1, arrowC1, arrowP2):
+            self.arrowHead.append(point)
+        painter.drawPolygon(self.arrowHead)
             
 if __name__ == '__main__':
     import sys
