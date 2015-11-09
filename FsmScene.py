@@ -168,12 +168,16 @@ class FsmScene(QtGui.QGraphicsScene):
                isinstance(endItems[0], FsmState):
                 #in endItems[0] is equal to self.line.startItem (loop back)
                 #we should check that there is at least an intermediate point
-                self.line.popIntermediatePoint()
-                self.line.addEndItem(endItems[0])
-                self.line.startItem().addOutboundTransition(self.line)
-                endItems[0].addInboundTransition(self.line)
-                self.line.setZValue(-1000.0)
-                self.line = None
+                if (len(self.line.intermediatePoints) and \
+                    self.line.startItem() == endItems[0]) or \
+                    self.line.startItem() != endItems[0]:
+                   
+                    self.line.popIntermediatePoint()
+                    self.line.addEndItem(endItems[0])
+                    self.line.startItem().addOutboundTransition(self.line)
+                    endItems[0].addInboundTransition(self.line)
+                    self.line.setZValue(-1000.0)
+                    self.line = None
                 
             else:
                 self.line.popIntermediatePoint()
