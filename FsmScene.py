@@ -119,8 +119,9 @@ class FsmScene(QtGui.QGraphicsScene):
             #self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
             #                            mouseEvent.scenePos()))
             startItems = self.items(mouseEvent.scenePos())
-            if len(startItems) and startItems[0] == self.line:
+            while len(startItems) and not isinstance(startItems[0], FsmState):
                 startItems.pop(0)
+                
             if len(startItems) and \
                isinstance(startItems[0], FsmState):
                 if not self.line:
@@ -161,7 +162,7 @@ class FsmScene(QtGui.QGraphicsScene):
             # if len(startItems) and startItems[0] == self.line:
             #     startItems.pop(0)
             endItems = self.items(mouseEvent.scenePos())
-            if len(endItems) and endItems[0] == self.line:
+            while len(endItems) and not isinstance(endItems[0], FsmState):
                 endItems.pop(0)
 
             if len(endItems) and \
@@ -208,7 +209,14 @@ class FsmScene(QtGui.QGraphicsScene):
             if isinstance(el, FsmState):
                 pos = el.scenePos().toPoint() / self.gridSize * self.gridSize
                 el.setPos(pos)
-        
+                
+    def keyPressEvent(self, keyEvent):
+        print keyEvent.key()
+        if self.line and keyEvent.key()==QtCore.Qt.Key_Escape:
+            self.removeItem(self.line)
+            self.line = None
+        return super(FsmScene, self).keyPressEvent(keyEvent)
+                
     def isItemChange(self, type):
         for item in self.selectedItems():
             if isinstance(item, type):
