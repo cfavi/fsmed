@@ -16,7 +16,7 @@ class FsmTransition(QtGui.QGraphicsPathItem):
     def __init__(self, startItem, endItem, parent=None, scene=None):
         super(FsmTransition, self).__init__(parent, scene)
 
-        self.arrowHead = QtGui.QPolygonF()
+        self.arrowHead = QtGui.QPainterPath()
         #self.path = QtGui.QPainterPath()
         
         self.myStartItem = startItem
@@ -60,9 +60,13 @@ class FsmTransition(QtGui.QGraphicsPathItem):
     #     return QtCore.QRectF(p1, QtCore.QSizeF(p2.x() - p1.x(), p2.y() - p1.y())).normalized().adjusted(-extra, -extra, extra, extra)
 
     def shape(self):
-        path = self.path() #super(FsmTransition, self).shape()
-        path.addPolygon(self.arrowHead)
-        return path
+        ps = QtGui.QPainterPathStroker()
+        ps.setWidth(5)
+        path = self.path()
+        path.addPath(self.arrowHead)
+        shapepath = ps.createStroke(path)
+
+        return shapepath
 
     
 
@@ -140,15 +144,21 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         self.update(self.boundingRect())
 
     def paint(self, painter, option, widget=None):
-        myPen = self.pen()
+
+        #display shape for debug
+        #painter.fillPath(self.shape(), QtCore.Qt.cyan)        
+        
+        
         if self.isSelected():
             c = QtGui.QColor() #TODO: highligh color should be taken from preference
             c.setHsv(30, 255, 255)
         else:
             c = QtCore.Qt.black
-        myPen.setColor(c)
-        painter.setPen(c)
 
+        painter.setPen(c)
+        painter.setBrush(QtCore.Qt.NoBrush)
+        
+        
         path = self.path()        
         painter.drawPath(path)
 
@@ -165,10 +175,16 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         arrowC1 = QtCore.QLineF.fromPolar(arrowSize/2,angle).translated(arrowTip).p2()        
         arrowP2 = QtCore.QLineF.fromPolar(arrowSize,angle-arrowAperture).translated(arrowTip).p2()
 
-        self.arrowHead.clear()
-        for point in (arrowTip, arrowP1, arrowC1, arrowP2):
-            self.arrowHead.append(point)
-        painter.drawPolygon(self.arrowHead)
+        self.arrowHead = QtGui.QPainterPath()
+        self.arrowHead.moveTo(arrowTip)
+        for point in (arrowP1, arrowC1, arrowP2):
+            self.arrowHead.lineTo(point)
+        self.arrowHead.closeSubpath()
+        painter.drawPath(self.arrowHead)
+        
+
+        
+        
             
 if __name__ == '__main__':
     import sys
