@@ -58,12 +58,6 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         self.myEndItem = endItem
         self.updatePosition()
 
-    # def boundingRect(self):
-    #     extra = (self.pen().width() + 20) / 2.0
-    #     p1 = self.line().p1()
-    #     p2 = self.line().p2()
-    #     return QtCore.QRectF(p1, QtCore.QSizeF(p2.x() - p1.x(), p2.y() - p1.y())).normalized().adjusted(-extra, -extra, extra, extra)
-
     def shape(self):
         ps = QtGui.QPainterPathStroker()
         ps.setWidth(5)
@@ -73,7 +67,8 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
         return shapepath
 
-    
+    def boundingRect(self):
+        return self.shape().boundingRect()
 
     def updatePosition(self):
         def computeControlPoints(K):
@@ -149,7 +144,6 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         self.update(self.boundingRect())
 
     def paint(self, painter, option, widget=None):
-
         #display shape for debug
         #painter.fillPath(self.shape(), QtCore.Qt.cyan)        
         
