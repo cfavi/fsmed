@@ -430,12 +430,16 @@ class MainWindow(QtGui.QMainWindow):
         self.addStateButton = QtGui.QToolButton()
         self.addStateButton.setCheckable(True)
         self.addStateButton.setIcon(QtGui.QIcon(':/images/floodfill.png'))
+        self.addStateActionButton = QtGui.QToolButton()
+        self.addStateActionButton.setCheckable(True)
+        self.addStateActionButton.setIcon(QtGui.QIcon(':/images/floodfill.png'))
         
 
         self.pointerTypeGroup = QtGui.QButtonGroup()
         self.pointerTypeGroup.addButton(self.pointerButton, FsmScene.MoveItem)
         self.pointerTypeGroup.addButton(self.linePointerButton,FsmScene.InsertLine)
         self.pointerTypeGroup.addButton(self.addStateButton, FsmScene.InsertState)
+        self.pointerTypeGroup.addButton(self.addStateActionButton, FsmScene.InsertStateAction)
         self.pointerTypeGroup.buttonClicked[int].connect(self.pointerGroupClicked)
 
         self.sceneScaleCombo = QtGui.QComboBox()
@@ -447,6 +451,7 @@ class MainWindow(QtGui.QMainWindow):
         self.pointerToolbar.addWidget(self.pointerButton)
         self.pointerToolbar.addWidget(self.linePointerButton)
         self.pointerToolbar.addWidget(self.addStateButton)
+        self.pointerToolbar.addWidget(self.addStateActionButton)
         self.pointerToolbar.addWidget(self.sceneScaleCombo)
 
     # def createBackgroundCellWidget(self, text, image):

@@ -1,10 +1,11 @@
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore, Qsci
+
 from diagramscene import DiagramItem, DiagramTextItem
 from FsmState import FsmState
 from FsmTransition import FsmTransition
 
 class FsmScene(QtGui.QGraphicsScene):
-    InsertState, InsertLine, InsertText, MoveItem  = range(4)
+    InsertState, InsertStateAction, InsertLine, InsertText, MoveItem  = range(5)
 
     itemInserted = QtCore.pyqtSignal(DiagramItem)
 
@@ -115,6 +116,18 @@ class FsmScene(QtGui.QGraphicsScene):
         #     self.addItem(item)
         #     item.setPos(mouseEvent.scenePos())
         #     self.itemInserted.emit(item)
+        elif self.myMode == self.InsertStateAction:
+            editor = Qsci.QsciScintilla()
+            lexer = Qsci.QsciLexerVHDL()
+            api = Qsci.QsciAPIs(lexer)
+            api.add("then")
+            api.prepare()
+            editor.setLexer(lexer)
+            editor.setAutoCompletionThreshold(2)
+            editor.setAutoCompletionSource(Qsci.QsciScintilla.AcsAPIs)
+            editor.setText("--Type some VHDL here\nif youcan then\nvery <= good;\n\endif")
+            item = self.addWidget(editor)
+            item.setPos(pos)
         elif self.myMode == self.InsertLine:
             #self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
             #                            mouseEvent.scenePos()))
