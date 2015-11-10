@@ -6,10 +6,7 @@ Created on Sat Dec 13 18:36:41 2014
 """
 
 from PyQt4 import QtCore, QtGui
-
-def debugPainterPath(p):
-    n = p.elementCount()
-    print "painterPath object with {} elements".format(n)
+from FsmGraphicHandle import FsmGraphicHandle
 
 class FsmTransition(QtGui.QGraphicsPathItem):
 #class FsmTransition(QtGui.QGraphicsLineItem):
@@ -40,13 +37,21 @@ class FsmTransition(QtGui.QGraphicsPathItem):
     def endItem(self):
         return self.myEndItem
 
-    def addIntermediatePoint(self, point):        
-        self.intermediatePoints.append(point)
+    def addIntermediatePoint(self, point):
+        #print "addIntermediatePoint @({},{})".format(point.x(), point.y())
+        
+        p = FsmGraphicHandle(parent=self, scene=self.scene())
+        p.setPos(point) #using setPos instead of constructor position
+                        #because it didn't get the right coordinates
+
+        self.intermediatePoints.append(p)
         self.updatePosition()
         
     def popIntermediatePoint(self):
         if len(self.intermediatePoints):
-            self.intermediatePoints.pop()
+            p = self.intermediatePoints.pop()
+            p.setParentItem(None)
+            self.scene().removeItem(p)
             self.updatePosition()
 
     def addEndItem(self, endItem):
@@ -117,9 +122,9 @@ class FsmTransition(QtGui.QGraphicsPathItem):
                 path.lineTo(self.myEndItem.pos())
                 self.lastSubPath = path
             else:
-                k = [self.myStartItem.pos()] + \
-                    self.intermediatePoints + \
-                    [self.myEndItem.pos()] 
+                k = [p.scenePos() for p in [self.myStartItem] + \
+                     self.intermediatePoints + \
+                     [self.myEndItem]]
 
                 kx = [p.x() for p in k]
                 ky = [p.y() for p in k]
@@ -130,17 +135,17 @@ class FsmTransition(QtGui.QGraphicsPathItem):
                 
                 for cc1,cc2,kk in zip(c1,c2,k[1:]):       
                     path.cubicTo(cc1,cc2,kk)
-                for cc1 in k[1:-1]:
-                    path.addEllipse(cc1, 2,2)
+                # for cc1 in k[1:-1]: #temporary showing knot points -> moved to FsmGraphicHandle
+                #     path.addEllipse(cc1, 2,2)
                 self.lastSubPath = QtGui.QPainterPath(k[-2])
                 self.lastSubPath.cubicTo(c1[-1],c2[-1],k[-1])
         else:
             for p in self.intermediatePoints:
-                path.lineTo(p)
+                path.lineTo(p.scenePos())
             self.lastSubPath = path
-        #debugPainterPath(path)
+
         self.setPath(path)
-        #debugPainterPath(self.path)
+
         self.update(self.boundingRect())
 
     def paint(self, painter, option, widget=None):
@@ -164,13 +169,14 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
         #draw arrow
         painter.setBrush(c)
+        #arrow computation should be moved elsewhere
         arrowSize = 20
         arrowAperture = 20 #degrees
         angle = self.lastSubPath.angleAtPercent(1.)+180
         if self.myEndItem:
             arrowTip = QtCore.QLineF.fromPolar(self.myEndItem.diameter/2, angle).translated(self.myEndItem.pos()).p2()
         else:
-            arrowTip = self.intermediatePoints[-1]
+            arrowTip = self.intermediatePoints[-1].pos()
         arrowP1 = QtCore.QLineF.fromPolar(arrowSize,angle+arrowAperture).translated(arrowTip).p2()             
         arrowC1 = QtCore.QLineF.fromPolar(arrowSize/2,angle).translated(arrowTip).p2()        
         arrowP2 = QtCore.QLineF.fromPolar(arrowSize,angle-arrowAperture).translated(arrowTip).p2()
