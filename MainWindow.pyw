@@ -429,7 +429,7 @@ class MainWindow(QtGui.QMainWindow):
         self.linePointerButton.setIcon(QtGui.QIcon(':/images/linepointer.png'))
         self.addStateButton = QtGui.QToolButton()
         self.addStateButton.setCheckable(True)
-        self.addStateButton.setIcon(QtGui.QIcon(':/images/floodfill.png'))
+        self.addStateButton.setIcon(QtGui.QIcon('images/addstate.svg'))
         self.addStateActionButton = QtGui.QToolButton()
         self.addStateActionButton.setCheckable(True)
         self.addStateActionButton.setIcon(QtGui.QIcon(':/images/floodfill.png'))
