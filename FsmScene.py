@@ -224,7 +224,6 @@ class FsmScene(QtGui.QGraphicsScene):
                 el.setPos(pos)
                 
     def keyPressEvent(self, keyEvent):
-        print keyEvent.key()
         if self.line and keyEvent.key()==QtCore.Qt.Key_Escape:
             self.removeItem(self.line)
             self.line = None

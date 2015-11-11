@@ -58,12 +58,6 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         self.myEndItem = endItem
         self.updatePosition()
 
-    # def boundingRect(self):
-    #     extra = (self.pen().width() + 20) / 2.0
-    #     p1 = self.line().p1()
-    #     p2 = self.line().p2()
-    #     return QtCore.QRectF(p1, QtCore.QSizeF(p2.x() - p1.x(), p2.y() - p1.y())).normalized().adjusted(-extra, -extra, extra, extra)
-
     def shape(self):
         ps = QtGui.QPainterPathStroker()
         ps.setWidth(5)
@@ -73,7 +67,8 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
         return shapepath
 
-    
+    def boundingRect(self):
+        return self.shape().boundingRect()
 
     def updatePosition(self):
         def computeControlPoints(K):
@@ -116,40 +111,42 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
         #start the path
         path = QtGui.QPainterPath(self.myStartItem.pos())
-        #if the transition is closed we beautify it...
-        if self.myEndItem:
-            if len(self.intermediatePoints)==0:
-                path.lineTo(self.myEndItem.pos())
-                self.lastSubPath = path
-            else:
-                k = [p.scenePos() for p in [self.myStartItem] + \
-                     self.intermediatePoints + \
-                     [self.myEndItem]]
 
-                kx = [p.x() for p in k]
-                ky = [p.y() for p in k]
-                c1x,c2x = computeControlPoints(kx)
-                c1y,c2y = computeControlPoints(ky)
-                c1 = tuple(QtCore.QPointF(x,y) for x,y in zip(c1x,c1y))
-                c2 = tuple(QtCore.QPointF(x,y) for x,y in zip(c2x,c2y))
-                
-                for cc1,cc2,kk in zip(c1,c2,k[1:]):       
-                    path.cubicTo(cc1,cc2,kk)
-                # for cc1 in k[1:-1]: #temporary showing knot points -> moved to FsmGraphicHandle
-                #     path.addEllipse(cc1, 2,2)
-                self.lastSubPath = QtGui.QPainterPath(k[-2])
-                self.lastSubPath.cubicTo(c1[-1],c2[-1],k[-1])
-        else:
-            for p in self.intermediatePoints:
-                path.lineTo(p.scenePos())
+        #if the path is at it beginning or it is a straight line to another state...
+        if len(self.intermediatePoints)<2 or \
+           not self.myEndItem and len(self.intermediatePoints)==0:            
+            if self.myEndItem:                     
+                path.lineTo(self.myEndItem.pos())
+            elif self.intermediatePoints:
+                path.lineTo(self.intermediatePoints[0].pos())
             self.lastSubPath = path
+        else:
+            itemList = [self.myStartItem]
+            itemList += self.intermediatePoints
+            if self.myEndItem:                     
+                itemList += [self.myEndItem]
+
+            k = [p.scenePos() for p in itemList]
+            
+            kx = [p.x() for p in k]
+            ky = [p.y() for p in k]
+            c1x,c2x = computeControlPoints(kx)
+            c1y,c2y = computeControlPoints(ky)
+            c1 = tuple(QtCore.QPointF(x,y) for x,y in zip(c1x,c1y))
+            c2 = tuple(QtCore.QPointF(x,y) for x,y in zip(c2x,c2y))
+
+            for cc1,cc2,kk in zip(c1,c2,k[1:]):       
+                path.cubicTo(cc1,cc2,kk)
+            # for cc1 in k[1:-1]: #temporary showing knot points -> moved to FsmGraphicHandle
+            #     path.addEllipse(cc1, 2,2)
+            self.lastSubPath = QtGui.QPainterPath(k[-2])
+            self.lastSubPath.cubicTo(c1[-1],c2[-1],k[-1])
 
         self.setPath(path)
 
         self.update(self.boundingRect())
 
     def paint(self, painter, option, widget=None):
-
         #display shape for debug
         #painter.fillPath(self.shape(), QtCore.Qt.cyan)        
         
