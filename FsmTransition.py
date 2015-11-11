@@ -15,7 +15,7 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
         self.arrowHead = QtGui.QPainterPath()
         #self.path = QtGui.QPainterPath()
-        
+
         self.myStartItem = startItem
         self.myEndItem = endItem
         self.intermediatePoints = []
@@ -39,14 +39,14 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
     def addIntermediatePoint(self, point):
         #print "addIntermediatePoint @({},{})".format(point.x(), point.y())
-        
+
         p = FsmGraphicHandle(parent=self, scene=self.scene())
         p.setPos(point) #using setPos instead of constructor position
                         #because it didn't get the right coordinates
 
         self.intermediatePoints.append(p)
         self.updatePosition()
-        
+
     def popIntermediatePoint(self):
         if len(self.intermediatePoints):
             p = self.intermediatePoints.pop()
@@ -73,26 +73,26 @@ class FsmTransition(QtGui.QGraphicsPathItem):
     def updatePosition(self):
         def computeControlPoints(K):
             '''compute cubicTo control points according to
-            https://www.particleincell.com/2012/bezier-splines/ 
+            https://www.particleincell.com/2012/bezier-splines/
 
             input K should be a list of x(or y) coordinates of the
-            knots 
+            knots
 
             returns two lists of control point x(or y) coordinates of
             length=(len(K)-1 )
 
             '''
             n=len(K)
-            #this is the tridiagonal matrix A 
+            #this is the tridiagonal matrix A
             a = [1]*(n-3) + [2]
             b = [2] + [4]*(n-3) + [7]
             c = [1]*(n-2)
 
             #this is rhs
             d = [K[0]+2*K[1]]
-            d +=[4*K[i]+2*K[i+1] for i in range(1, n-2)] 
+            d +=[4*K[i]+2*K[i+1] for i in range(1, n-2)]
             d +=[8*K[n-2]+K[n-1]]
-            
+
             #solve Ax=d with the Thomas algorithm
             #TODO optimize it with np
             def TDMAsolve(a,b,c,d):
@@ -112,10 +112,11 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         #start the path
         path = QtGui.QPainterPath(self.myStartItem.pos())
 
+        #print self.intermediatePoints, self.myEndItem
         #if the path is at it beginning or it is a straight line to another state...
-        if len(self.intermediatePoints)<2 or \
-           not self.myEndItem and len(self.intermediatePoints)==0:            
-            if self.myEndItem:                     
+        if (self.myEndItem and len(self.intermediatePoints)==0) or \
+           (not self.myEndItem and len(self.intermediatePoints)<2):
+            if self.myEndItem:
                 path.lineTo(self.myEndItem.pos())
             elif self.intermediatePoints:
                 path.lineTo(self.intermediatePoints[0].pos())
@@ -123,11 +124,11 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         else:
             itemList = [self.myStartItem]
             itemList += self.intermediatePoints
-            if self.myEndItem:                     
+            if self.myEndItem:
                 itemList += [self.myEndItem]
 
             k = [p.scenePos() for p in itemList]
-            
+
             kx = [p.x() for p in k]
             ky = [p.y() for p in k]
             c1x,c2x = computeControlPoints(kx)
@@ -135,7 +136,7 @@ class FsmTransition(QtGui.QGraphicsPathItem):
             c1 = tuple(QtCore.QPointF(x,y) for x,y in zip(c1x,c1y))
             c2 = tuple(QtCore.QPointF(x,y) for x,y in zip(c2x,c2y))
 
-            for cc1,cc2,kk in zip(c1,c2,k[1:]):       
+            for cc1,cc2,kk in zip(c1,c2,k[1:]):
                 path.cubicTo(cc1,cc2,kk)
             # for cc1 in k[1:-1]: #temporary showing knot points -> moved to FsmGraphicHandle
             #     path.addEllipse(cc1, 2,2)
@@ -148,9 +149,9 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
     def paint(self, painter, option, widget=None):
         #display shape for debug
-        #painter.fillPath(self.shape(), QtCore.Qt.cyan)        
-        
-        
+        #painter.fillPath(self.shape(), QtCore.Qt.cyan)
+
+
         if self.isSelected():
             c = QtGui.QColor() #TODO: highligh color should be taken from preference
             c.setHsv(30, 255, 255)
@@ -159,9 +160,9 @@ class FsmTransition(QtGui.QGraphicsPathItem):
 
         painter.setPen(c)
         painter.setBrush(QtCore.Qt.NoBrush)
-        
-        
-        path = self.path()        
+
+
+        path = self.path()
         painter.drawPath(path)
 
         #draw arrow
@@ -174,8 +175,8 @@ class FsmTransition(QtGui.QGraphicsPathItem):
             arrowTip = QtCore.QLineF.fromPolar(self.myEndItem.diameter/2, angle).translated(self.myEndItem.pos()).p2()
         else:
             arrowTip = self.intermediatePoints[-1].pos()
-        arrowP1 = QtCore.QLineF.fromPolar(arrowSize,angle+arrowAperture).translated(arrowTip).p2()             
-        arrowC1 = QtCore.QLineF.fromPolar(arrowSize/2,angle).translated(arrowTip).p2()        
+        arrowP1 = QtCore.QLineF.fromPolar(arrowSize,angle+arrowAperture).translated(arrowTip).p2()
+        arrowC1 = QtCore.QLineF.fromPolar(arrowSize/2,angle).translated(arrowTip).p2()
         arrowP2 = QtCore.QLineF.fromPolar(arrowSize,angle-arrowAperture).translated(arrowTip).p2()
 
         self.arrowHead = QtGui.QPainterPath()
@@ -184,17 +185,17 @@ class FsmTransition(QtGui.QGraphicsPathItem):
             self.arrowHead.lineTo(point)
         self.arrowHead.closeSubpath()
         painter.drawPath(self.arrowHead)
-        
 
-        
-        
-            
+
+
+
+
 if __name__ == '__main__':
     import sys
     from MainWindow import MainWindow
     from PyQt4.QtTest import QTest
     from PyQt4.QtCore import Qt
-    
+
     app = QtGui.QApplication(sys.argv)
 
 
@@ -205,9 +206,9 @@ if __name__ == '__main__':
     QTest.mouseClick(mainWindow.addStateButton, Qt.LeftButton)
     QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
     QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
-    QTest.mouseClick(mainWindow.linePointerButton, Qt.LeftButton)
+    QTest.mouseClick(mainWindow.addTransitionButton, Qt.LeftButton)
     QTest.mousePress(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
     QTest.mouseMove(mainWindow.view.viewport(), QtCore.QPoint(100,250))
     QTest.mouseRelease(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
-        
-    sys.exit(app.exec_())    
+
+    sys.exit(app.exec_())
