@@ -101,7 +101,7 @@ class MainWindow(QtGui.QMainWindow):
                 item.removeArrows()
             self.scene.removeItem(item)
 
-    def pointerGroupClicked(self, i):
+    def pointerGroupClicked(self):
         self.scene.setMode(self.pointerTypeGroup.checkedId())
         if self.pointerTypeGroup.checkedId()==FsmScene.MoveItem:
             self.view.setDragMode(QtGui.QGraphicsView.RubberBandDrag)
@@ -319,6 +319,40 @@ class MainWindow(QtGui.QMainWindow):
                 statusTip="Delete item from FSM",
                 triggered=self.deleteItem)
 
+        self.selectionModeAction = QtGui.QAction(QtGui.QIcon(':/images/pointer.png'),
+                                                 "&Select mode", 
+                                                 self, 
+                                                 shortcut="Ctrl+1",
+                                                 statusTip="Selection mode",
+                                                 checkable=True,
+                                                 checked=True,
+                                                 triggered=self.pointerGroupClicked)
+
+        self.addStateAction = QtGui.QAction(QtGui.QIcon('images/addstate.svg'),
+                                            "&Add State mode", 
+                                            self, 
+                                            shortcut="Ctrl+2",
+                                            statusTip="Add new state mode",
+                                            checkable=True,
+                                            triggered=self.pointerGroupClicked)
+
+        self.addTransitionAction = QtGui.QAction(QtGui.QIcon('images/addtransition.svg'),
+                                                 "&Add Transition mode", 
+                                                 self, 
+                                                 shortcut="Ctrl+3",
+                                                 statusTip="Add new transition mode",
+                                                 checkable=True,
+                                                 triggered=self.pointerGroupClicked)
+
+        self.addStateActionAction = QtGui.QAction(QtGui.QIcon('images/addstateaction.svg'),
+                                            "&Add State Action mode", 
+                                            self, 
+                                            shortcut="Ctrl+4",
+                                            statusTip="Add state action mode",
+                                            checkable=True,
+                                            triggered=self.pointerGroupClicked)
+
+
         self.exitAction = QtGui.QAction("E&xit", self, shortcut=QtGui.QKeySequence.Quit,
                 statusTip="Quit", triggered=self.close)
 
@@ -421,26 +455,25 @@ class MainWindow(QtGui.QMainWindow):
         # self.colorToolBar.addWidget(self.lineColorToolButton)
 
         self.pointerButton = QtGui.QToolButton()
-        self.pointerButton.setCheckable(True)
         self.pointerButton.setChecked(True)
-        self.pointerButton.setIcon(QtGui.QIcon(':/images/pointer.png'))
-        self.linePointerButton = QtGui.QToolButton()
-        self.linePointerButton.setCheckable(True)
-        self.linePointerButton.setIcon(QtGui.QIcon('images/addtransition.svg'))
+        self.pointerButton.setDefaultAction(self.selectionModeAction)
+
+        self.addTransitionButton = QtGui.QToolButton()
+        self.addTransitionButton.setDefaultAction(self.addTransitionAction)
+
         self.addStateButton = QtGui.QToolButton()
-        self.addStateButton.setCheckable(True)
-        self.addStateButton.setIcon(QtGui.QIcon('images/addstate.svg'))
+        self.addStateButton.setDefaultAction(self.addStateAction)
+
         self.addStateActionButton = QtGui.QToolButton()
-        self.addStateActionButton.setCheckable(True)
-        self.addStateActionButton.setIcon(QtGui.QIcon(':/images/floodfill.png'))
+        self.addStateActionButton.setDefaultAction(self.addStateActionAction)
         
 
         self.pointerTypeGroup = QtGui.QButtonGroup()
         self.pointerTypeGroup.addButton(self.pointerButton, FsmScene.MoveItem)
-        self.pointerTypeGroup.addButton(self.linePointerButton,FsmScene.InsertLine)
+        self.pointerTypeGroup.addButton(self.addTransitionButton,FsmScene.InsertLine)
         self.pointerTypeGroup.addButton(self.addStateButton, FsmScene.InsertState)
         self.pointerTypeGroup.addButton(self.addStateActionButton, FsmScene.InsertStateAction)
-        self.pointerTypeGroup.buttonClicked[int].connect(self.pointerGroupClicked)
+        
 
         self.sceneScaleCombo = QtGui.QComboBox()
         self.sceneScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
@@ -449,8 +482,8 @@ class MainWindow(QtGui.QMainWindow):
 
         self.pointerToolbar = self.addToolBar("Pointer type")
         self.pointerToolbar.addWidget(self.pointerButton)
-        self.pointerToolbar.addWidget(self.linePointerButton)
         self.pointerToolbar.addWidget(self.addStateButton)
+        self.pointerToolbar.addWidget(self.addTransitionButton)
         self.pointerToolbar.addWidget(self.addStateActionButton)
         self.pointerToolbar.addWidget(self.sceneScaleCombo)
 
