@@ -426,7 +426,7 @@ class MainWindow(QtGui.QMainWindow):
         self.pointerButton.setIcon(QtGui.QIcon(':/images/pointer.png'))
         self.linePointerButton = QtGui.QToolButton()
         self.linePointerButton.setCheckable(True)
-        self.linePointerButton.setIcon(QtGui.QIcon(':/images/linepointer.png'))
+        self.linePointerButton.setIcon(QtGui.QIcon('images/addtransition.svg'))
         self.addStateButton = QtGui.QToolButton()
         self.addStateButton.setCheckable(True)
         self.addStateButton.setIcon(QtGui.QIcon('images/addstate.svg'))
