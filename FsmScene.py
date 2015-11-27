@@ -1,13 +1,14 @@
-from PyQt4 import QtGui, QtCore, Qsci
+from PyQt4 import QtGui, QtCore#, Qsci
 
-from diagramscene import DiagramItem, DiagramTextItem
+#from diagramscene import DiagramItem, DiagramTextItem
 from FsmState import FsmState
+from FsmStateAction import FsmStateAction
 from FsmTransition import FsmTransition
 
 class FsmScene(QtGui.QGraphicsScene):
     InsertState, InsertStateAction, InsertLine, InsertText, MoveItem  = range(5)
 
-    itemInserted = QtCore.pyqtSignal(DiagramItem)
+    #itemInserted = QtCore.pyqtSignal(DiagramItem)
 
     textInserted = QtCore.pyqtSignal(QtGui.QGraphicsTextItem)
 
@@ -22,7 +23,6 @@ class FsmScene(QtGui.QGraphicsScene):
         self.stateCreatedIdx = 0
         self.myItemMenu = itemMenu
         self.myMode = self.MoveItem
-        self.myItemType = DiagramItem.Step
         self.line = None
         self.textItem = None
         self.myItemColor = QtCore.Qt.white
@@ -86,9 +86,6 @@ class FsmScene(QtGui.QGraphicsScene):
     def setMode(self, mode):
         self.myMode = mode
 
-    # def setItemType(self, type):
-    #     self.myItemType = type
-
     def editorLostFocus(self, item):
         cursor = item.textCursor()
         cursor.clearSelection()
@@ -126,10 +123,8 @@ class FsmScene(QtGui.QGraphicsScene):
         #     self.itemInserted.emit(item)
         elif self.myMode == self.InsertStateAction:
             if stateAtPos:
-                item = QtGui.QGraphicsTextItem("--type something", parent=stateAtPos)
-                item.setTextWidth(150)
-                item.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
-                item.setPos(QtCore.QPoint(50, -50))
+                item = FsmStateAction("--type something", parent=stateAtPos)
+
             # editor = Qsci.QsciScintilla()
             # lexer = Qsci.QsciLexerVHDL()
             # api = Qsci.QsciAPIs(lexer)
