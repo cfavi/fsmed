@@ -58,36 +58,36 @@ class FsmScene(QtGui.QGraphicsScene):
         painter.setPen(QtGui.QPen(QtCore.Qt.gray, 0))
         painter.drawLines(lines);
 
-    def setLineColor(self, color):
-        self.myLineColor = color
-        if self.isItemChange(FsmTransition):
-            item = self.selectedItems()[0]
-            item.setColor(self.myLineColor)
-            self.update()
+    # def setLineColor(self, color):
+    #     self.myLineColor = color
+    #     if self.isItemChange(FsmTransition):
+    #         item = self.selectedItems()[0]
+    #         item.setColor(self.myLineColor)
+    #         self.update()
 
-    def setTextColor(self, color):
-        self.myTextColor = color
-        if self.isItemChange(DiagramTextItem):
-            item = self.selectedItems()[0]
-            item.setDefaultTextColor(self.myTextColor)
+    # def setTextColor(self, color):
+    #     self.myTextColor = color
+    #     if self.isItemChange(DiagramTextItem):
+    #         item = self.selectedItems()[0]
+    #         item.setDefaultTextColor(self.myTextColor)
 
-    def setItemColor(self, color):
-        self.myItemColor = color
-        if self.isItemChange(DiagramItem):
-            item = self.selectedItems()[0]
-            item.setBrush(self.myItemColor)
+    # def setItemColor(self, color):
+    #     self.myItemColor = color
+    #     if self.isItemChange(DiagramItem):
+    #         item = self.selectedItems()[0]
+    #         item.setBrush(self.myItemColor)
 
-    def setFont(self, font):
-        self.myFont = font
-        if self.isItemChange(DiagramTextItem):
-            item = self.selectedItems()[0]
-            item.setFont(self.myFont)
+    # def setFont(self, font):
+    #     self.myFont = font
+    #     if self.isItemChange(DiagramTextItem):
+    #         item = self.selectedItems()[0]
+    #         item.setFont(self.myFont)
 
     def setMode(self, mode):
         self.myMode = mode
 
-    def setItemType(self, type):
-        self.myItemType = type
+    # def setItemType(self, type):
+    #     self.myItemType = type
 
     def editorLostFocus(self, item):
         cursor = item.textCursor()
@@ -100,6 +100,14 @@ class FsmScene(QtGui.QGraphicsScene):
 
     def mousePressEvent(self, mouseEvent):
         pos = mouseEvent.scenePos().toPoint() / self.gridSize * self.gridSize
+        stateAtPos = self.items(mouseEvent.scenePos())
+        while len(stateAtPos) and not isinstance(stateAtPos[0], FsmState):
+            stateAtPos.pop(0)
+        if len(stateAtPos):
+            stateAtPos = stateAtPos[0]
+        else:
+            stateAtPos = None
+
         if (mouseEvent.button() != QtCore.Qt.LeftButton):
             return
 
@@ -117,17 +125,22 @@ class FsmScene(QtGui.QGraphicsScene):
         #     item.setPos(mouseEvent.scenePos())
         #     self.itemInserted.emit(item)
         elif self.myMode == self.InsertStateAction:
-            editor = Qsci.QsciScintilla()
-            lexer = Qsci.QsciLexerVHDL()
-            api = Qsci.QsciAPIs(lexer)
-            api.add("then")
-            api.prepare()
-            editor.setLexer(lexer)
-            editor.setAutoCompletionThreshold(2)
-            editor.setAutoCompletionSource(Qsci.QsciScintilla.AcsAPIs)
-            editor.setText("--Type some VHDL here\nif youcan then\nvery <= good;\n\endif")
-            item = self.addWidget(editor)
-            item.setPos(pos)
+            if stateAtPos:
+                item = QtGui.QGraphicsTextItem("--type something", parent=stateAtPos)
+                item.setTextWidth(150)
+                item.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
+                item.setPos(QtCore.QPoint(50, -50))
+            # editor = Qsci.QsciScintilla()
+            # lexer = Qsci.QsciLexerVHDL()
+            # api = Qsci.QsciAPIs(lexer)
+            # api.add("then")
+            # api.prepare()
+            # editor.setLexer(lexer)
+            # editor.setAutoCompletionThreshold(2)
+            # editor.setAutoCompletionSource(Qsci.QsciScintilla.AcsAPIs)
+            # editor.setText("--Type some VHDL here\nif youcan then\nvery <= good;\n\endif")
+            # item = self.addWidget(editor)
+            # item.setPos(pos)
         elif self.myMode == self.InsertLine:
             #self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
             #                            mouseEvent.scenePos()))
