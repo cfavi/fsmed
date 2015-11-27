@@ -6,6 +6,11 @@ class FsmState(QtGui.QGraphicsEllipseItem):
     def __init__(self, contextMenu, stateName='S0', pos=None, parent=None, scene=None):
         super(FsmState, self).__init__(parent, scene)
 
+        self.stateNameTextItem = QtGui.QGraphicsTextItem(parent=self, scene=scene)
+        self.stateNameTextItem.setPlainText(stateName)
+        self.stateNameTextItem.setTextInteractionFlags(QtCore.Qt.TextEditable)
+        brc = self.stateNameTextItem.boundingRect()
+        self.stateNameTextItem.setPos(- brc.width()/2, - brc.height()/2)
         self.stateName = stateName
         self.diameter = 50
         self.setRect(self.diameter//-2,self.diameter//-2,self.diameter,self.diameter)
@@ -31,7 +36,7 @@ class FsmState(QtGui.QGraphicsEllipseItem):
             painter.setBrush(QtCore.Qt.cyan)
         painter.drawEllipse(-self.diameter/2, -self.diameter/2, self.diameter, self.diameter)
  #       super(FsmState, self).paint(painter, option, widget)
-        painter.drawText(self.boundingRect(), QtCore.Qt.AlignCenter, self.stateName)
+ #painter.drawText(self.boundingRect(), QtCore.Qt.AlignCenter, self.stateName)
 
     def keyPressEvent(self, keyEvent):
         pass
@@ -77,7 +82,8 @@ class FsmState(QtGui.QGraphicsEllipseItem):
         
         return super(FsmState, self).itemChange(change,value)
 
-
+    # def mouseDoubleClickEvent(self, event):        
+    #     pass
 if __name__ == '__main__':
     import sys
     from MainWindow import MainWindow
@@ -94,7 +100,7 @@ if __name__ == '__main__':
     QTest.mouseClick(mainWindow.addStateButton, Qt.LeftButton)
     QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
     QTest.mouseClick(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
-    QTest.mouseClick(mainWindow.linePointerButton, Qt.LeftButton)
+    QTest.mouseClick(mainWindow.addTransitionButton, Qt.LeftButton)
     QTest.mousePress(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(400,200))
     QTest.mouseMove(mainWindow.view.viewport(), QtCore.QPoint(100,250))
     QTest.mouseRelease(mainWindow.view.viewport(), Qt.LeftButton, Qt.NoModifier, QtCore.QPoint(100,250))
