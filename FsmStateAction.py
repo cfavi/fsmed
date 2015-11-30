@@ -2,6 +2,7 @@ from PyQt4 import QtGui, QtCore
 
 #from FsmState import FsmState
 #from FsmTransition import FsmTransition
+from VHDLHighlighter import VHDLHighlighter
 
 class FsmStateAction(QtGui.QGraphicsRectItem):
     def __init__(self, text="", parent=None,scene=None):
@@ -11,6 +12,7 @@ class FsmStateAction(QtGui.QGraphicsRectItem):
         self.textItem.setTextWidth(150)
         self.textItem.setTextWidth(150)
         #self.textItem.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
+        self.highlighter = VHDLHighlighter(self.textItem.document())
 
         self.setPos(QtCore.QPoint(50, -50))
         self.setRect(self.textItem.boundingRect())
