@@ -232,9 +232,13 @@ class FsmScene(QtGui.QGraphicsScene):
                 el.setPos(pos)
                 
     def keyPressEvent(self, keyEvent):
-        if self.line and keyEvent.key()==QtCore.Qt.Key_Escape:
-            self.removeItem(self.line)
-            self.line = None
+        if self.line:
+            if keyEvent.key()==QtCore.Qt.Key_Escape:
+                self.removeItem(self.line)
+                self.line = None
+            elif keyEvent.key()==QtCore.Qt.Key_Backspace and \
+                 self.line.getNbOfIntermediatePoints() > 1:
+                self.line.popIntermediatePoint()
         return super(FsmScene, self).keyPressEvent(keyEvent)
                 
     def isItemChange(self, type):

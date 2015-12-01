@@ -21,6 +21,7 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         self.intermediatePoints = []
         self.updatePosition()
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
+
         #self.myColor = QtCore.Qt.black
         #self.setPen(QtGui.QPen(self.myColor, 1, QtCore.Qt.SolidLine,
         #                       QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
@@ -47,6 +48,10 @@ class FsmTransition(QtGui.QGraphicsPathItem):
         self.intermediatePoints.append(p)
         self.updatePosition()
 
+    def removeIntermediatePoint(self, p):
+        if p in self.intermediatePoints:
+            self.intermediatePoints.remove(p)
+
     def popIntermediatePoint(self):
         if len(self.intermediatePoints):
             p = self.intermediatePoints.pop()
@@ -54,10 +59,18 @@ class FsmTransition(QtGui.QGraphicsPathItem):
             self.scene().removeItem(p)
             self.updatePosition()
 
+    
+    def getNbOfIntermediatePoints(self):
+        return len(self.intermediatePoints)
+
     def addEndItem(self, endItem):
         self.myEndItem = endItem
         self.updatePosition()
 
+    def keyPressEvent(self, event):
+        print "FsmTransition received keyPressEvent: ", event
+
+    # Paint related section
     def shape(self):
         ps = QtGui.QPainterPathStroker()
         ps.setWidth(5)
