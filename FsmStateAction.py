@@ -10,7 +10,6 @@ class FsmStateAction(QtGui.QGraphicsRectItem):
 
         self.textItem = QtGui.QGraphicsTextItem(text, parent=self);
         self.textItem.setTextWidth(150)
-        self.textItem.setTextWidth(150)
         #self.textItem.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
         self.highlighter = VHDLHighlighter(self.textItem.document())
 
