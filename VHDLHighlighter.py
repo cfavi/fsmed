@@ -2,6 +2,7 @@ from PyQt4 import QtCore, QtGui
 
 
 class VHDLHighlighter(QtGui.QSyntaxHighlighter):
+    ''' Very basic VHDL syntax highlighter'''
     def __init__(self, parent=None):
         super(VHDLHighlighter, self).__init__(parent)
 
@@ -37,34 +38,19 @@ class VHDLHighlighter(QtGui.QSyntaxHighlighter):
         self.highlightingRules = [(QtCore.QRegExp(pattern), keywordFormat)
                 for pattern in keywordPatterns]
 
-        # classFormat = QtGui.QTextCharFormat()
-        # classFormat.setFontWeight(QtGui.QFont.Bold)
-        # classFormat.setForeground(QtCore.Qt.darkMagenta)
-        # self.highlightingRules.append((QtCore.QRegExp("\\bQ[A-Za-z]+\\b"),
-        #         classFormat))
-
         singleLineCommentFormat = QtGui.QTextCharFormat()
         singleLineCommentFormat.setForeground(QtCore.Qt.darkGreen)
         singleLineCommentFormat.setFontItalic(True)
         self.highlightingRules.append((QtCore.QRegExp("--[^\n]*"),
                 singleLineCommentFormat))
 
-        # self.multiLineCommentFormat = QtGui.QTextCharFormat()
-        # self.multiLineCommentFormat.setForeground(QtCore.Qt.red)
-
         quotationFormat = QtGui.QTextCharFormat()
-        quotationFormat.setForeground(QtCore.Qt.darkGreen)
+        quotationFormat.setForeground(QtCore.Qt.darkRed)
         self.highlightingRules.append((QtCore.QRegExp("\".*\""),
-                quotationFormat))
+                                       quotationFormat))
+        self.highlightingRules.append((QtCore.QRegExp("\'.*\'"),
+                                       quotationFormat))
 
-        # functionFormat = QtGui.QTextCharFormat()
-        # functionFormat.setFontItalic(True)
-        # functionFormat.setForeground(QtCore.Qt.blue)
-        # self.highlightingRules.append((QtCore.QRegExp("\\b[A-Za-z0-9_]+(?=\\()"),
-        #         functionFormat))
-
-        # self.commentStartExpression = QtCore.QRegExp("/\\*")
-        # self.commentEndExpression = QtCore.QRegExp("\\*/")
 
     def highlightBlock(self, text):
         for pattern, format in self.highlightingRules:
@@ -75,22 +61,6 @@ class VHDLHighlighter(QtGui.QSyntaxHighlighter):
                 self.setFormat(index, length, format)
                 index = expression.indexIn(text, index + length)
 
-        # self.setCurrentBlockState(0)
 
-        # startIndex = 0
-        # if self.previousBlockState() != 1:
-        #     startIndex = self.commentStartExpression.indexIn(text)
 
-        # while startIndex >= 0:
-        #     endIndex = self.commentEndExpression.indexIn(text, startIndex)
 
-        #     if endIndex == -1:
-        #         self.setCurrentBlockState(1)
-        #         commentLength = len(text) - startIndex
-        #     else:
-        #         commentLength = endIndex - startIndex + self.commentEndExpression.matchedLength()
-
-        #     self.setFormat(startIndex, commentLength,
-        #             self.multiLineCommentFormat)
-        #     startIndex = self.commentStartExpression.indexIn(text,
-        #             startIndex + commentLength);
